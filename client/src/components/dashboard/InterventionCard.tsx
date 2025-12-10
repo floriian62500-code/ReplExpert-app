@@ -115,8 +115,15 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
          
          <div className="flex gap-2">
             <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                <Button size="sm" variant="outline" className={cn(
+                    "gap-2 relative",
+                    intervention.id === "int-101" && "border-blue-300 bg-blue-50 text-blue-700 animate-pulse" // Mock notification for demo
+                )}>
                     <MessageSquare className="h-4 w-4" />
+                    <span className="hidden sm:inline">Message</span>
+                    {intervention.id === "int-101" && (
+                        <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white" />
+                    )}
                 </Button>
             } />
             

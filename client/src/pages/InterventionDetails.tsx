@@ -59,8 +59,15 @@ export default function InterventionDetails() {
           </div>
           <div className="flex space-x-2">
              <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
-                <Button variant="ghost" size="icon" className="text-primary">
-                   <MessageSquare className="h-5 w-5" />
+                <Button variant="outline" size="sm" className={cn(
+                    "gap-2 text-primary border-primary/20 bg-primary/5 relative",
+                    intervention.id === "int-101" && "animate-pulse border-blue-300 bg-blue-50"
+                )}>
+                   <MessageSquare className="h-4 w-4" />
+                   <span className="hidden sm:inline">Discussion</span>
+                   {intervention.id === "int-101" && (
+                        <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white" />
+                   )}
                 </Button>
              } />
           </div>
