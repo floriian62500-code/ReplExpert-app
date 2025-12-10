@@ -66,8 +66,8 @@ export default function InterventionDetails() {
       { id: "supplies", name: "Petites fournitures", price: 15, quantity: 1, type: "service" }
   ]);
   const [isAddingArticle, setIsAddingArticle] = useState(false);
-  const [interventionOutcome, setInterventionOutcome] = useState("finished"); // "finished" | "quote_needed"
   const [signature, setSignature] = useState(false); // Mock signature state
+  const [showFinishDialog, setShowFinishDialog] = useState(false);
 
   const handleNotifyClient = () => {
     toast({
@@ -276,35 +276,6 @@ export default function InterventionDetails() {
 
                         <Separator />
 
-                        {/* Clôture Intervention */}
-                        <div className="space-y-4">
-                            <Label className="font-semibold flex items-center gap-2">
-                                <CheckSquare className="h-4 w-4" /> Résultat de l'intervention
-                            </Label>
-                            <RadioGroup value={interventionOutcome} onValueChange={setInterventionOutcome} className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <RadioGroupItem value="finished" id="outcome-finished" className="peer sr-only" />
-                                    <Label
-                                        htmlFor="outcome-finished"
-                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-green-500 peer-data-[state=checked]:bg-green-50 [&:has([data-state=checked])]:border-green-500"
-                                    >
-                                        <CheckSquare className="mb-3 h-6 w-6 text-green-600" />
-                                        Terminé
-                                    </Label>
-                                </div>
-                                <div>
-                                    <RadioGroupItem value="quote_needed" id="outcome-quote" className="peer sr-only" />
-                                    <Label
-                                        htmlFor="outcome-quote"
-                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-500 peer-data-[state=checked]:bg-orange-50 [&:has([data-state=checked])]:border-orange-500"
-                                    >
-                                        <FileText className="mb-3 h-6 w-6 text-orange-600" />
-                                        Devis à faire
-                                    </Label>
-                                </div>
-                            </RadioGroup>
-                        </div>
-
                         {/* Signature Client */}
                         <div className="space-y-2">
                             <Label className="font-semibold flex items-center gap-2">
@@ -338,19 +309,11 @@ export default function InterventionDetails() {
                                 toast({ title: "Signature manquante", description: "Veuillez faire signer le client.", variant: "destructive" });
                                 return;
                             }
-                            setShowDepannageReport(false);
-                            toast({ 
-                                title: interventionOutcome === 'finished' ? "Intervention terminée" : "Demande de devis enregistrée", 
-                                description: interventionOutcome === 'finished' ? "La facturette a été envoyée au client." : "Les informations ont été transmises au bureau." 
-                            });
-                            // handleNotifyClient(); // Maybe separate notification for finish
+                            setShowFinishDialog(true);
                         }} 
-                        className={cn(
-                            "w-full text-white",
-                            interventionOutcome === 'finished' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"
-                        )}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                        {interventionOutcome === 'finished' ? "Valider, Facturer et Terminer" : "Valider et Transmettre pour Devis"}
+                        Valider le rapport
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Annuler</Button>
@@ -359,6 +322,49 @@ export default function InterventionDetails() {
             </div>
         </DrawerContent>
       </Drawer>
+
+      <Dialog open={showFinishDialog} onOpenChange={setShowFinishDialog}>
+        <DialogContent className="sm:max-w-md">
+            <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckSquare className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">L'intervention est-elle terminée ?</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Confirmez si le problème est résolu ou si un devis complémentaire est nécessaire.
+                    </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 w-full mt-2">
+                    <Button 
+                        className="h-24 flex flex-col gap-2 bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                            setShowFinishDialog(false);
+                            setShowDepannageReport(false);
+                            toast({ title: "Intervention terminée", description: "La facturette a été envoyée au client." });
+                        }}
+                    >
+                        <CheckSquare className="h-6 w-6" />
+                        <span className="font-semibold">Terminée</span>
+                        <span className="text-xs text-white/80 font-normal">Facturer et clôturer</span>
+                    </Button>
+                    <Button 
+                        variant="outline" 
+                        className="h-24 flex flex-col gap-2 hover:border-orange-500 hover:bg-orange-50 hover:text-orange-700"
+                        onClick={() => {
+                            setShowFinishDialog(false);
+                            setShowDepannageReport(false);
+                            toast({ title: "Demande de devis", description: "Transmis au bureau pour chiffrage complémentaire." });
+                        }}
+                    >
+                        <FileText className="h-6 w-6 text-orange-600" />
+                        <span className="font-semibold">Devis à faire</span>
+                        <span className="text-xs text-muted-foreground font-normal">Suite à donner</span>
+                    </Button>
+                </div>
+            </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showTypeSelection} onOpenChange={setShowTypeSelection}>
         <DialogContent className="sm:max-w-md">
