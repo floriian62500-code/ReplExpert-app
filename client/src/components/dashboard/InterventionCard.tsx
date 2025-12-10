@@ -127,8 +127,7 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
                     intervention.id === "int-101" && "border-blue-300 bg-blue-50 text-blue-700"
                 )}>
                     <Building2 className="h-4 w-4" />
-                    <span className="text-xs font-medium hidden sm:inline">Contacter bureau</span>
-                    <span className="text-xs font-medium sm:hidden">Bureau</span>
+                    <span className="text-xs font-medium">Bureau</span>
                     {intervention.id === "int-101" && (
                         <>
                             <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-ping opacity-75" />
