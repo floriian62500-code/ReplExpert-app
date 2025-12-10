@@ -38,12 +38,18 @@ export default function InterventionDetails() {
   const intervention = MOCK_INTERVENTIONS.find(i => i.id === params?.id);
   const [cancelReason, setCancelReason] = useState("client_absent");
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [status, setStatus] = useState(intervention?.status || "todo");
+  
+  // Use a local override status to ensure UI updates immediately
+  const [overrideStatus, setOverrideStatus] = useState<string | null>(null);
+  const status = overrideStatus || intervention?.status || "todo";
 
   // Mock state for photos
   const [photosBefore, setPhotosBefore] = useState([
       { id: 1, url: stockLeakRepair, room: "cuisine" }
   ]);
+
+  console.log("RENDER InterventionDetails status:", status);
+
   const [photosAfter, setPhotosAfter] = useState([
       { id: 2, url: stockFaucetNew, room: "cuisine" }
   ]);
@@ -91,7 +97,7 @@ export default function InterventionDetails() {
   
   const handleStartIntervention = () => {
       console.log("Starting intervention...");
-      setStatus("in_progress");
+      setOverrideStatus("in_progress");
       try {
         handleNotifyClient();
       } catch (e) {
