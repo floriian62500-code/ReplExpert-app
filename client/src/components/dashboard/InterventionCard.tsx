@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Intervention, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
-import { MapPin, Clock, MessageSquare, ArrowRight, Play, BellRing, Package } from "lucide-react";
+import { MapPin, Clock, MessageSquare, ArrowRight, Play, BellRing, Package, Users, Building2 } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -53,6 +53,14 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground line-clamp-1">{intervention.clientName}</p>
+              
+              {intervention.technicians && intervention.technicians.length > 0 && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground my-0.5">
+                    <Users className="h-3 w-3" />
+                    <span>{intervention.technicians.join(", ")}</span>
+                </div>
+              )}
+
               <div className="flex gap-2 mt-1 flex-wrap items-center">
                  {intervention.types.map(type => (
                      <Badge key={type} variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border bg-white", TRADE_CONFIG[type]?.color, "border-current opacity-80")}>
@@ -120,11 +128,12 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
          
          <div className="flex gap-2">
             <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
-                <Button size="icon" variant="outline" className={cn(
-                    "h-8 w-8 relative",
+                <Button size="sm" variant="outline" className={cn(
+                    "gap-2 relative",
                     intervention.id === "int-101" && "border-blue-300 bg-blue-50 text-blue-700"
                 )}>
-                    <MessageSquare className="h-4 w-4" />
+                    <Building2 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Contacter bureau</span>
                     {intervention.id === "int-101" && (
                         <span className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 rounded-full border-2 border-white text-[10px] text-white flex items-center justify-center font-bold">
                             2

@@ -39,6 +39,7 @@ export interface Intervention {
   crmType: "a_definir" | "travaux" | "rdf";
   materialsStatus: "none" | "provided" | "to_buy";
   materialsList?: string;
+  technicians?: string[];
 }
 
 export interface Technician {
@@ -106,7 +107,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     reportStatus: "pending",
     crmType: "travaux",
     materialsStatus: "to_buy",
-    materialsList: "Joints standard 15/21, Siphon PVC d40"
+    materialsList: "Joints standard 15/21, Siphon PVC d40",
+    technicians: ["Thomas"]
   },
   {
     id: "int-102",
@@ -121,7 +123,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     description: "Porte d'entrée difficile à fermer. Frottement en bas à droite.",
     reportStatus: "pending",
     crmType: "a_definir",
-    materialsStatus: "none"
+    materialsStatus: "none",
+    technicians: ["Thomas", "Lucas"]
   },
   {
     id: "int-103",
