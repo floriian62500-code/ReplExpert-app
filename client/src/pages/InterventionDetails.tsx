@@ -315,7 +315,12 @@ export default function InterventionDetails() {
                                 toast({ title: "Signature manquante", description: "Veuillez faire signer le client.", variant: "destructive" });
                                 return;
                             }
-                            setShowFinishDialog(true);
+                            // Validate and close report first (User flow: Validate -> Then Ask)
+                            setShowDepannageReport(false);
+                            toast({ title: "Rapport validé", description: "L'intervention est enregistrée." });
+                            
+                            // Open the follow-up question dialog after a short delay for smooth transition
+                            setTimeout(() => setShowFinishDialog(true), 300);
                         }} 
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >
@@ -423,7 +428,7 @@ export default function InterventionDetails() {
                         className="h-24 flex flex-col gap-2 hover:bg-gray-100"
                         onClick={() => {
                             setShowFinishDialog(false);
-                            setShowDepannageReport(false);
+                            // Report already closed
                             toast({ title: "Dossier clôturé", description: "Intervention terminée sans suite." });
                         }}
                     >
@@ -435,7 +440,7 @@ export default function InterventionDetails() {
                         className="h-24 flex flex-col gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                         onClick={() => {
                             setShowFinishDialog(false);
-                            setShowDepannageReport(false);
+                            // Report already closed
                             // Open RDF module
                             setTimeout(() => setShowRDFReport(true), 300);
                         }}
