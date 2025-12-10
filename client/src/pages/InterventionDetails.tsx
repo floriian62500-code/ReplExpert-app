@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ChatSheet } from "@/components/chat/ChatSheet";
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerClose } from "@/components/ui/drawer";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -245,21 +246,80 @@ export default function InterventionDetails() {
                     </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="photos" className="space-y-3 mt-4">
-                    <Card className="border-dashed border-2">
-                        <CardContent className="flex flex-col items-center justify-center py-8 gap-2">
-                            <div className="bg-muted p-3 rounded-full">
-                                <Camera className="h-6 w-6 text-muted-foreground" />
-                            </div>
-                            <div className="text-center">
-                                <p className="text-sm font-medium">Aucune photo</p>
-                                <p className="text-xs text-muted-foreground">Prendre une photo de l'intervention</p>
-                            </div>
-                            <Button size="sm" variant="outline" className="mt-2">
-                                <Camera className="mr-2 h-4 w-4" /> Ajouter
-                            </Button>
-                        </CardContent>
-                    </Card>
+                <TabsContent value="photos" className="space-y-6 mt-4">
+                    {/* Section Avant Travaux */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold flex items-center gap-2">
+                                <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-md border border-orange-200">AVANT</span>
+                                Travaux
+                            </h3>
+                            <span className="text-xs text-muted-foreground">0 photos</span>
+                        </div>
+                        <Card className="border-dashed border-2 bg-muted/10">
+                            <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
+                                <div className="bg-muted p-3 rounded-full">
+                                    <Camera className="h-5 w-5 text-muted-foreground" />
+                                </div>
+                                <div className="w-full max-w-[200px]">
+                                    <Label className="text-xs text-muted-foreground mb-1.5 block text-center">Pièce concernée</Label>
+                                    <Select defaultValue="cuisine">
+                                        <SelectTrigger className="h-8 text-xs bg-background">
+                                            <SelectValue placeholder="Choisir pièce" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="cuisine">Cuisine</SelectItem>
+                                            <SelectItem value="sdb">Salle de bain</SelectItem>
+                                            <SelectItem value="salon">Salon</SelectItem>
+                                            <SelectItem value="entree">Entrée</SelectItem>
+                                            <SelectItem value="exterieur">Extérieur</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button size="sm" variant="outline" className="mt-1 w-full max-w-[200px]">
+                                    <Camera className="mr-2 h-3.5 w-3.5" /> Ajouter photo Avant
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <Separator />
+
+                    {/* Section Après Travaux */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold flex items-center gap-2">
+                                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-md border border-green-200">APRÈS</span>
+                                Travaux
+                            </h3>
+                            <span className="text-xs text-muted-foreground">0 photos</span>
+                        </div>
+                        <Card className="border-dashed border-2 bg-muted/10">
+                            <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
+                                <div className="bg-muted p-3 rounded-full">
+                                    <Camera className="h-5 w-5 text-muted-foreground" />
+                                </div>
+                                <div className="w-full max-w-[200px]">
+                                    <Label className="text-xs text-muted-foreground mb-1.5 block text-center">Pièce concernée</Label>
+                                    <Select defaultValue="cuisine">
+                                        <SelectTrigger className="h-8 text-xs bg-background">
+                                            <SelectValue placeholder="Choisir pièce" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="cuisine">Cuisine</SelectItem>
+                                            <SelectItem value="sdb">Salle de bain</SelectItem>
+                                            <SelectItem value="salon">Salon</SelectItem>
+                                            <SelectItem value="entree">Entrée</SelectItem>
+                                            <SelectItem value="exterieur">Extérieur</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button size="sm" variant="outline" className="mt-1 w-full max-w-[200px]">
+                                    <Camera className="mr-2 h-3.5 w-3.5" /> Ajouter photo Après
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="docs" className="space-y-3 mt-4">
