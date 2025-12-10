@@ -13,7 +13,7 @@ export function StatCard({ technician }: StatCardProps) {
   const isAhead = progress > 70; // Arbitrary logic for demo
 
   return (
-    <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-primary to-blue-800 text-primary-foreground">
+    <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-primary to-blue-800 text-primary-foreground rounded-xl">
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-4">
           <div>
