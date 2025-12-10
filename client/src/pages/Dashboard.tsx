@@ -23,16 +23,6 @@ export default function Dashboard() {
           <StatCard technician={MOCK_TECHNICIAN} />
         </section>
 
-        {/* Quick Actions - New */}
-        <section className="grid grid-cols-1">
-            <ChatSheet context="Bureau" trigger={
-                <Button variant="outline" className="w-full bg-white shadow-sm border-2 border-dashed border-primary/20 text-primary h-14 gap-2 rounded-xl hover:bg-primary/5 hover:border-primary/40 transition-all">
-                    <MessageSquare className="h-5 w-5" />
-                    <span className="font-semibold">Contacter le bureau</span>
-                </Button>
-            } />
-        </section>
-
         {/* Interventions of the day */}
         <section>
           <div className="flex items-center justify-between mb-3">
