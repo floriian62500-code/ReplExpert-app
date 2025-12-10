@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { useRoute } from "wouter";
-import { MOCK_INTERVENTIONS, TRADE_ICONS, TRADE_LABELS } from "@/lib/mockData";
+import { MOCK_INTERVENTIONS, TRADE_ICONS, TRADE_LABELS, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 export default function InterventionDetails() {
   const [, params] = useRoute("/intervention/:id");
@@ -27,7 +28,10 @@ export default function InterventionDetails() {
                 <ArrowLeft className="h-6 w-6" />
              </Button>
           </Link>
-          <h1 className="font-semibold text-lg flex-1 truncate">Intervention #{intervention.id.split('-')[1]}</h1>
+          <div className="flex-1 overflow-hidden">
+             <h1 className="font-semibold text-lg truncate">Intervention #{intervention.id.split('-')[1]}</h1>
+             <p className="text-xs text-muted-foreground truncate">{intervention.clientName}</p>
+          </div>
           <div className="flex space-x-2">
              <Button variant="ghost" size="icon" className="text-primary">
                <MessageSquare className="h-5 w-5" />
@@ -59,6 +63,11 @@ export default function InterventionDetails() {
                 <CardContent className="p-5 space-y-4">
                     <div className="flex justify-between items-start">
                         <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="outline" className={cn("text-[10px] font-medium border", CRM_TYPE_COLORS[intervention.crmType])}>
+                                    {CRM_TYPE_LABELS[intervention.crmType]}
+                                </Badge>
+                            </div>
                             <h2 className="text-xl font-bold">{intervention.clientName}</h2>
                             <p className="text-muted-foreground text-sm uppercase font-medium tracking-wide">{intervention.clientType}</p>
                         </div>

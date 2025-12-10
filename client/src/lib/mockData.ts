@@ -26,6 +26,7 @@ export interface Intervention {
   status: InterventionStatus;
   description: string;
   reportStatus?: "pending" | "submitted"; // New field for report status
+  crmType: "a_definir" | "travaux" | "rdf";
 }
 
 export interface Technician {
@@ -60,6 +61,18 @@ export const MOCK_HR: HRData = {
   pendingLeaveRequests: 1
 };
 
+export const CRM_TYPE_LABELS: Record<string, string> = {
+  a_definir: "À définir",
+  travaux: "Travaux",
+  rdf: "RDF"
+};
+
+export const CRM_TYPE_COLORS: Record<string, string> = {
+  a_definir: "bg-gray-100 text-gray-700 border-gray-200",
+  travaux: "bg-blue-50 text-blue-700 border-blue-200",
+  rdf: "bg-purple-50 text-purple-700 border-purple-200"
+};
+
 export const MOCK_INTERVENTIONS: Intervention[] = [
   {
     id: "int-101",
@@ -72,7 +85,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["plomberie"],
     status: "todo",
     description: "Fuite sous évier cuisine + remplacement joint.",
-    reportStatus: "pending"
+    reportStatus: "pending",
+    crmType: "travaux"
   },
   {
     id: "int-102",
@@ -85,7 +99,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["serrurerie", "menuiserie"],
     status: "todo",
     description: "Porte bloquée locataire + réglage fenêtre salon.",
-    reportStatus: "pending"
+    reportStatus: "pending",
+    crmType: "a_definir"
   },
   {
     id: "int-103",
@@ -98,7 +113,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["vitrerie"],
     status: "todo",
     description: "Remplacement double vitrage cassé suite effraction.",
-    reportStatus: "pending"
+    reportStatus: "pending",
+    crmType: "travaux"
   },
   {
     id: "int-104",
@@ -111,7 +127,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["electricite"],
     status: "todo",
     description: "Panne éclairage parties communes hall B.",
-    reportStatus: "pending"
+    reportStatus: "pending",
+    crmType: "rdf"
   },
   // History items
   {
@@ -125,7 +142,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["plomberie"],
     status: "done",
     description: "Remplacement robinet cuisine.",
-    reportStatus: "pending" // Needs finalizing
+    reportStatus: "pending", // Needs finalizing
+    crmType: "travaux"
   },
   {
     id: "int-097",
@@ -138,7 +156,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["electricite"],
     status: "done",
     description: "Installation nouvelles prises fournil.",
-    reportStatus: "submitted"
+    reportStatus: "submitted",
+    crmType: "travaux"
   },
   {
     id: "int-096",
@@ -151,7 +170,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     types: ["serrurerie"],
     status: "done",
     description: "Ouverture de porte claquée.",
-    reportStatus: "submitted"
+    reportStatus: "submitted",
+    crmType: "rdf"
   }
 ];
 

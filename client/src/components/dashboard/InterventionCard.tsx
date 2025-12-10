@@ -1,9 +1,10 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Intervention, TRADE_ICONS, TRADE_LABELS } from "@/lib/mockData";
+import { Intervention, TRADE_ICONS, TRADE_LABELS, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
 import { MapPin, Clock, MessageSquare, ArrowRight, Play, Wrench } from "lucide-react";
 import { Link } from "wouter";
+import { cn } from "@/lib/utils";
 
 interface InterventionCardProps {
   intervention: Intervention;
@@ -22,9 +23,14 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">{intervention.clientName}</p>
-              <Badge variant="outline" className="text-[10px] py-0 h-5 text-muted-foreground font-normal border-border bg-muted/50">
-                {TRADE_LABELS[intervention.types[0]]}
-              </Badge>
+              <div className="flex gap-2 mt-1">
+                 <Badge variant="outline" className="text-[10px] py-0 h-5 text-muted-foreground font-normal border-border bg-muted/50">
+                   {TRADE_LABELS[intervention.types[0]]}
+                 </Badge>
+                 <Badge variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border", CRM_TYPE_COLORS[intervention.crmType])}>
+                    {CRM_TYPE_LABELS[intervention.crmType]}
+                 </Badge>
+              </div>
             </div>
           </div>
           <Badge variant={intervention.status === "in_progress" ? "default" : "secondary"} className="uppercase text-[10px]">
