@@ -1,10 +1,10 @@
 import { Layout } from "@/components/layout/Layout";
 import { useRoute } from "wouter";
-import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
+import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MATERIALS_LABELS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -165,13 +165,49 @@ export default function InterventionDetails() {
                 </CardContent>
             </Card>
 
-            {/* Description */}
-            <section>
-                <h3 className="font-semibold mb-2">Description</h3>
-                <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg border">
-                    {intervention.description}
-                </p>
-            </section>
+            {/* Mission & Materials */}
+            <Card className="shadow-sm border border-border">
+                <CardContent className="p-4 space-y-4">
+                    
+                    {/* Mission Description */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Info className="h-4 w-4 text-primary" />
+                            <h3 className="font-semibold text-sm">Motif de l'intervention</h3>
+                        </div>
+                        <p className="text-sm text-foreground bg-muted/50 p-3 rounded-md">
+                            {intervention.description}
+                        </p>
+                    </div>
+
+                    <Separator />
+
+                    {/* Materials */}
+                    <div>
+                         <div className="flex items-center gap-2 mb-2">
+                            <Package className="h-4 w-4 text-secondary" />
+                            <h3 className="font-semibold text-sm">Fournitures & Matériel</h3>
+                        </div>
+                        
+                        <div className={cn(
+                            "p-3 rounded-md border text-sm",
+                            intervention.materialsStatus === "none" && "bg-gray-50 border-gray-200 text-gray-600",
+                            intervention.materialsStatus === "provided" && "bg-green-50 border-green-200 text-green-700",
+                            intervention.materialsStatus === "to_buy" && "bg-orange-50 border-orange-200 text-orange-700",
+                        )}>
+                            <p className="font-semibold mb-1">
+                                {MATERIALS_LABELS[intervention.materialsStatus]}
+                            </p>
+                            {intervention.materialsList && (
+                                <p className="text-xs opacity-90 mt-1 pl-2 border-l-2 border-current">
+                                    {intervention.materialsList}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                </CardContent>
+            </Card>
 
             {/* Actions Grid */}
             <div className="grid grid-cols-2 gap-3">

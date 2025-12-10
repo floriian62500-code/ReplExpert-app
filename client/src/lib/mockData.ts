@@ -37,6 +37,8 @@ export interface Intervention {
   description: string;
   reportStatus?: "pending" | "submitted";
   crmType: "a_definir" | "travaux" | "rdf";
+  materialsStatus: "none" | "provided" | "to_buy";
+  materialsList?: string;
 }
 
 export interface Technician {
@@ -83,6 +85,12 @@ export const CRM_TYPE_COLORS: Record<string, string> = {
   rdf: "bg-purple-50 text-purple-700 border-purple-200"
 };
 
+export const MATERIALS_LABELS: Record<string, string> = {
+  none: "Aucune fourniture requise",
+  provided: "Matériel fourni (au dépôt)",
+  to_buy: "Matériel à acheter"
+};
+
 export const MOCK_INTERVENTIONS: Intervention[] = [
   {
     id: "int-101",
@@ -94,9 +102,11 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date().toISOString().split('T')[0], // Today
     types: ["plomberie"],
     status: "todo",
-    description: "Fuite sous évier cuisine + remplacement joint.",
+    description: "Fuite constatée sous l'évier de la cuisine. Le client signale un joint défectueux.",
     reportStatus: "pending",
-    crmType: "travaux"
+    crmType: "travaux",
+    materialsStatus: "to_buy",
+    materialsList: "Joints standard 15/21, Siphon PVC d40"
   },
   {
     id: "int-102",
@@ -108,9 +118,10 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date().toISOString().split('T')[0], // Today
     types: ["serrurerie", "menuiserie"],
     status: "todo",
-    description: "Porte bloquée locataire + réglage fenêtre salon.",
+    description: "Porte d'entrée difficile à fermer. Frottement en bas à droite.",
     reportStatus: "pending",
-    crmType: "a_definir"
+    crmType: "a_definir",
+    materialsStatus: "none"
   },
   {
     id: "int-103",
@@ -122,9 +133,11 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date().toISOString().split('T')[0], // Today
     types: ["vitrerie"],
     status: "todo",
-    description: "Remplacement double vitrage cassé suite effraction.",
+    description: "Remplacement double vitrage 4/16/4 suite à bris de glace.",
     reportStatus: "pending",
-    crmType: "travaux"
+    crmType: "travaux",
+    materialsStatus: "provided",
+    materialsList: "Double vitrage 4/16/4 sur mesure (commande #8821)"
   },
   {
     id: "int-104",
@@ -136,9 +149,11 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
     types: ["electricite"],
     status: "todo",
-    description: "Panne éclairage parties communes hall B.",
+    description: "Plusieurs luminaires HS dans le hall d'entrée.",
     reportStatus: "pending",
-    crmType: "rdf"
+    crmType: "rdf",
+    materialsStatus: "to_buy",
+    materialsList: "Ampoules LED E27, Starter néon"
   },
   // History items
   {
@@ -153,7 +168,9 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     status: "done",
     description: "Remplacement robinet cuisine.",
     reportStatus: "pending", // Needs finalizing
-    crmType: "travaux"
+    crmType: "travaux",
+    materialsStatus: "provided",
+    materialsList: "Mitigeur Grohe"
   },
   {
     id: "int-097",
@@ -167,7 +184,9 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     status: "done",
     description: "Installation nouvelles prises fournil.",
     reportStatus: "submitted",
-    crmType: "travaux"
+    crmType: "travaux",
+    materialsStatus: "to_buy",
+    materialsList: "Prises étanches Legrand x3, Câble 2.5mm"
   },
   {
     id: "int-096",
@@ -181,7 +200,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     status: "done",
     description: "Ouverture de porte claquée.",
     reportStatus: "submitted",
-    crmType: "rdf"
+    crmType: "rdf",
+    materialsStatus: "none"
   }
 ];
 
