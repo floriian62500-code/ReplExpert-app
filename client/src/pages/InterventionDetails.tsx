@@ -4,7 +4,7 @@ import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MAT
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -47,12 +47,37 @@ export default function InterventionDetails() {
   const primaryType = intervention.types[0];
   const primaryConfig = TRADE_CONFIG[primaryType] || TRADE_CONFIG["plomberie"];
 
+  // Local state for crmType to allow switching in prototype
+  const [currentCrmType, setCurrentCrmType] = useState(intervention.crmType);
+  const [showTypeSelection, setShowTypeSelection] = useState(false);
+
   const handleNotifyClient = () => {
     toast({
       title: "Client prévenu",
       description: "Un SMS automatique a été envoyé au client pour signaler votre arrivée.",
       duration: 3000,
     });
+  };
+  
+  const handleStartIntervention = () => {
+      if (currentCrmType === 'a_definir') {
+          setShowTypeSelection(true);
+      } else {
+          handleNotifyClient();
+      }
+  };
+
+  const selectInterventionType = (type: "travaux" | "rdf") => {
+      setCurrentCrmType(type);
+      setShowTypeSelection(false);
+      
+      toast({
+          title: "Type d'intervention défini",
+          description: `Mode ${type === 'travaux' ? 'Dépannage' : 'Relevé Technique'} activé.`,
+      });
+      
+      // Simulate slight delay before notifying client like normal flow
+      setTimeout(handleNotifyClient, 500);
   };
 
   const submitCantDo = () => {
@@ -76,6 +101,42 @@ export default function InterventionDetails() {
   return (
     <Layout>
       {/* Custom Header for Detail View */}
+      <Dialog open={showTypeSelection} onOpenChange={setShowTypeSelection}>
+        <DialogContent className="sm:max-w-md">
+            <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Info className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Type d'intervention</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Cette intervention n'est pas qualifiée. Que souhaitez-vous faire ?
+                    </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 w-full mt-2">
+                    <Button 
+                        variant="outline" 
+                        className="h-24 flex flex-col gap-2 hover:border-blue-500 hover:bg-blue-50"
+                        onClick={() => selectInterventionType('travaux')}
+                    >
+                        <Wrench className="h-6 w-6 text-blue-600" />
+                        <span className="font-semibold">Dépanner</span>
+                        <span className="text-xs text-muted-foreground font-normal">Réparation immédiate</span>
+                    </Button>
+                    <Button 
+                        variant="outline" 
+                        className="h-24 flex flex-col gap-2 hover:border-purple-500 hover:bg-purple-50"
+                        onClick={() => selectInterventionType('rdf')}
+                    >
+                        <FileText className="h-6 w-6 text-purple-600" />
+                        <span className="font-semibold">Relevé Tech.</span>
+                        <span className="text-xs text-muted-foreground font-normal">Prise de cotes / Devis</span>
+                    </Button>
+                </div>
+            </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
         <DialogContent className="max-w-3xl p-0 overflow-hidden bg-black/90 border-none h-full md:h-auto flex flex-col justify-center">
             <div className="relative w-full h-full flex items-center justify-center">
@@ -162,8 +223,8 @@ export default function InterventionDetails() {
                     <div className="flex justify-between items-start">
                         <div>
                             <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                <Badge variant="outline" className={cn("text-[10px] font-medium border", CRM_TYPE_COLORS[intervention.crmType])}>
-                                    {CRM_TYPE_LABELS[intervention.crmType]}
+                                <Badge variant="outline" className={cn("text-[10px] font-medium border", CRM_TYPE_COLORS[currentCrmType])}>
+                                    {CRM_TYPE_LABELS[currentCrmType]}
                                 </Badge>
                                 {/* Display all trade badges */}
                                 {intervention.types.map(type => {
@@ -327,7 +388,7 @@ export default function InterventionDetails() {
                         </DrawerContent>
                     </Drawer>
 
-                    <Button className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white shadow-md text-xs sm:text-sm" onClick={handleNotifyClient}>
+                    <Button className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white shadow-md text-xs sm:text-sm" onClick={handleStartIntervention}>
                         <Play className="h-4 w-4 sm:mr-2 shrink-0 fill-current" />
                         Commencer
                     </Button>
@@ -478,7 +539,8 @@ export default function InterventionDetails() {
                             </div>
                         </Card>
 
-                        {/* Relevé Technique (RT) */}
+                        {/* Relevé Technique (RT) - Only show if RDF or A Definir */}
+                        {(currentCrmType === 'rdf' || currentCrmType === 'a_definir') && (
                         <Card className="overflow-hidden">
                             <div className="flex items-center p-3 gap-3">
                                 <div className="bg-purple-100 p-2 rounded-lg shrink-0">
@@ -493,8 +555,10 @@ export default function InterventionDetails() {
                                 </Button>
                             </div>
                         </Card>
+                        )}
 
-                        {/* Commande */}
+                        {/* Commande - Only show if Travaux */}
+                        {currentCrmType === 'travaux' && (
                         <Card className="overflow-hidden">
                             <div className="flex items-center p-3 gap-3">
                                 <div className="bg-orange-100 p-2 rounded-lg shrink-0">
@@ -509,6 +573,7 @@ export default function InterventionDetails() {
                                 </Button>
                             </div>
                         </Card>
+                        )}
                     </div>
 
                     <Button size="sm" variant="outline" className="w-full mt-2 border-dashed">
