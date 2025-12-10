@@ -13,10 +13,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ChatSheet } from "@/components/chat/ChatSheet";
 
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerClose } from "@/components/ui/drawer";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+
 export default function InterventionDetails() {
   const [, params] = useRoute("/intervention/:id");
   const { toast } = useToast();
   const intervention = MOCK_INTERVENTIONS.find(i => i.id === params?.id);
+  const [cancelReason, setCancelReason] = useState("client_absent");
 
   if (!intervention) return <div>Intervention non trouvée</div>;
 
@@ -32,10 +38,17 @@ export default function InterventionDetails() {
     });
   };
 
-  const handleCantDo = () => {
+  const submitCantDo = () => {
+      const reasons: Record<string, string> = {
+          client_absent: "Client absent",
+          no_time: "Manque de temps",
+          wrong_material: "Pas le bon matériel",
+          sav_product: "SAV produit"
+      };
+      
       toast({
           title: "Signalement enregistré",
-          description: "Le bureau a été notifié que vous ne pouvez pas effectuer cette intervention.",
+          description: `Motif : ${reasons[cancelReason]}`,
           variant: "destructive"
       });
   };
@@ -315,11 +328,51 @@ export default function InterventionDetails() {
          <div className="flex gap-3">
             {intervention.status === "todo" && (
                 <>
-                    <Button variant="outline" className="flex-1 h-12 border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm" onClick={handleCantDo}>
-                        <Ban className="h-4 w-4 sm:mr-2 shrink-0" />
-                        <span className="hidden sm:inline">Je ne peux pas</span>
-                        <span className="sm:hidden">Impossible</span>
-                    </Button>
+                    <Drawer>
+                        <DrawerTrigger asChild>
+                            <Button variant="outline" className="flex-1 h-12 border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm">
+                                <Ban className="h-4 w-4 sm:mr-2 shrink-0" />
+                                <span className="hidden sm:inline">Je ne peux pas</span>
+                                <span className="sm:hidden">Impossible</span>
+                            </Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                            <div className="mx-auto w-full max-w-sm">
+                                <DrawerHeader>
+                                    <DrawerTitle>Pourquoi ne pouvez-vous pas intervenir ?</DrawerTitle>
+                                </DrawerHeader>
+                                <div className="p-4 pb-0">
+                                    <RadioGroup value={cancelReason} onValueChange={setCancelReason} className="gap-3">
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="client_absent" id="r1" />
+                                            <Label htmlFor="r1" className="flex-1 cursor-pointer">Client absent</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="no_time" id="r2" />
+                                            <Label htmlFor="r2" className="flex-1 cursor-pointer">Manque de temps</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="wrong_material" id="r3" />
+                                            <Label htmlFor="r3" className="flex-1 cursor-pointer">Pas le bon matériel</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="sav_product" id="r4" />
+                                            <Label htmlFor="r4" className="flex-1 cursor-pointer">SAV produit</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                                <DrawerFooter>
+                                    <DrawerClose asChild>
+                                        <Button onClick={submitCantDo} variant="destructive">Confirmer</Button>
+                                    </DrawerClose>
+                                    <DrawerClose asChild>
+                                        <Button variant="outline">Annuler</Button>
+                                    </DrawerClose>
+                                </DrawerFooter>
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
+                    
                     <Button className="flex-[2] h-12 text-base shadow-lg shadow-primary/20 gap-2">
                         <Play className="h-5 w-5 fill-current" /> Commencer
                     </Button>
