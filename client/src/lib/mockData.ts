@@ -213,6 +213,10 @@ export interface TradeConfig {
   icon: string; // URL/Path to image
   color: string; // Tailwind color class for text/border
   bgColor: string; // Tailwind color class for background
+  cardBg: string; // Subtle background for the card
+  materialBg: string; // Background for material section
+  materialBorder: string; // Border for material section
+  materialText: string; // Text color for material section
 }
 
 export const TRADE_CONFIG: Record<string, TradeConfig> = {
@@ -220,61 +224,101 @@ export const TRADE_CONFIG: Record<string, TradeConfig> = {
     label: "Plomberie",
     icon: pictoPlomberie,
     color: "text-cyan-600",
-    bgColor: "bg-cyan-100"
+    bgColor: "bg-cyan-100",
+    cardBg: "bg-cyan-50",
+    materialBg: "bg-cyan-50",
+    materialBorder: "border-cyan-200",
+    materialText: "text-cyan-700"
   },
   vitrerie: {
     label: "Vitrerie",
     icon: pictoVitrerie,
     color: "text-green-600",
-    bgColor: "bg-green-100"
+    bgColor: "bg-green-100",
+    cardBg: "bg-green-50",
+    materialBg: "bg-green-50",
+    materialBorder: "border-green-200",
+    materialText: "text-green-700"
   },
   menuiserie: {
     label: "Menuiserie",
     icon: pictoMenuiserie,
     color: "text-orange-600",
-    bgColor: "bg-orange-100"
+    bgColor: "bg-orange-100",
+    cardBg: "bg-orange-50",
+    materialBg: "bg-orange-50",
+    materialBorder: "border-orange-200",
+    materialText: "text-orange-700"
   },
   electricite: {
     label: "Électricité",
     icon: pictoElec,
     color: "text-amber-500",
-    bgColor: "bg-amber-100"
+    bgColor: "bg-amber-100",
+    cardBg: "bg-amber-50",
+    materialBg: "bg-amber-50",
+    materialBorder: "border-amber-200",
+    materialText: "text-amber-700"
   },
   platrerie: {
     label: "Plâtrerie",
     icon: pictoRenovation,
     color: "text-stone-600",
-    bgColor: "bg-stone-100"
+    bgColor: "bg-stone-100",
+    cardBg: "bg-stone-50",
+    materialBg: "bg-stone-50",
+    materialBorder: "border-stone-200",
+    materialText: "text-stone-700"
   },
   peinture: {
     label: "Peinture",
     icon: pictoRenovation,
     color: "text-stone-600",
-    bgColor: "bg-stone-100"
+    bgColor: "bg-stone-100",
+    cardBg: "bg-stone-50",
+    materialBg: "bg-stone-50",
+    materialBorder: "border-stone-200",
+    materialText: "text-stone-700"
   },
   isolation: {
     label: "Isolation",
-    icon: pictoPMR, // Using PMR/Adaptation picto as fallback or if appropriate
+    icon: pictoPMR, 
     color: "text-blue-600",
-    bgColor: "bg-blue-100"
+    bgColor: "bg-blue-100",
+    cardBg: "bg-blue-50",
+    materialBg: "bg-blue-50",
+    materialBorder: "border-blue-200",
+    materialText: "text-blue-700"
   },
   "volet roulant": {
     label: "Volet Roulant",
     icon: pictoVR,
     color: "text-purple-600",
-    bgColor: "bg-purple-100"
+    bgColor: "bg-purple-100",
+    cardBg: "bg-purple-50",
+    materialBg: "bg-purple-50",
+    materialBorder: "border-purple-200",
+    materialText: "text-purple-700"
   },
   serrurerie: {
     label: "Serrurerie",
     icon: pictoSerrurerie,
     color: "text-pink-600",
-    bgColor: "bg-pink-100"
+    bgColor: "bg-pink-100",
+    cardBg: "bg-pink-50",
+    materialBg: "bg-pink-50",
+    materialBorder: "border-pink-200",
+    materialText: "text-pink-700"
   },
   chauffage: {
     label: "Chauffage",
-    icon: pictoPlomberie, // Fallback
+    icon: pictoPlomberie, 
     color: "text-cyan-600",
-    bgColor: "bg-cyan-100"
+    bgColor: "bg-cyan-100",
+    cardBg: "bg-cyan-50",
+    materialBg: "bg-cyan-50",
+    materialBorder: "border-cyan-200",
+    materialText: "text-cyan-700"
   }
 };
 
