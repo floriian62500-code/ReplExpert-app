@@ -67,8 +67,13 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
               </div>
             </div>
           </div>
-          <Badge variant={intervention.status === "in_progress" ? "default" : "secondary"} className="uppercase text-[10px]">
-            {intervention.status === "todo" ? "À faire" : intervention.status === "in_progress" ? "En cours" : "Terminé"}
+          <Badge variant="outline" className={cn(
+            "uppercase text-[10px]",
+            intervention.status === "todo" && "bg-secondary text-secondary-foreground border-transparent",
+            intervention.status === "in_progress" && "bg-orange-100 text-orange-700 border-orange-200",
+            intervention.status === "done" && "bg-green-100 text-green-700 border-green-200"
+          )}>
+            {intervention.status === "todo" ? "À faire" : intervention.status === "in_progress" ? "En cours" : "Réalisé"}
           </Badge>
         </div>
 
