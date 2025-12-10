@@ -95,9 +95,16 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
 
           <div className={cn(
              "mt-2 text-xs p-2 rounded border flex flex-col gap-1",
-             // Logic: Green if supplies needed (provided or to_buy), Red if none needed
-             intervention.materialsStatus === "none" ? "bg-red-50 border-red-200 text-red-700" :
-             "bg-green-50 border-green-200 text-green-700"
+             // Logic: Dynamic based on universe color
+             (() => {
+                 const colorName = primaryConfig.color.replace("text-", "").replace("-600", "").replace("-500", "");
+                 if (intervention.materialsStatus === "none") {
+                    return "bg-red-50 border-red-200 text-red-700";
+                 }
+                 // For positive states, use universe color
+                 // Tailwind class construction
+                 return `bg-${colorName}-50 border-${colorName}-200 text-${colorName}-700`;
+             })()
           )}>
              <div className="flex items-center gap-2 font-medium">
                  <Package className="h-3 w-3 shrink-0" />
