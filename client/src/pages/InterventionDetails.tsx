@@ -153,14 +153,6 @@ export default function InterventionDetails() {
                             </div>
                          </a>
                     </div>
-                    
-                    <Button 
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm" 
-                        onClick={handleNotifyClient}
-                    >
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Prévenir le client de mon arrivée
-                    </Button>
 
                 </CardContent>
             </Card>

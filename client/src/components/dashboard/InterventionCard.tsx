@@ -85,16 +85,17 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="bg-muted/30 p-2 px-4 flex justify-between items-center border-t border-border">
-         <div className="flex space-x-2">
+      <CardFooter className="bg-muted/30 p-2 px-4 flex justify-between items-center border-t border-border gap-2">
+         <Button variant="outline" size="sm" className="h-8 text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 text-xs px-2" onClick={handleNotifyClient}>
+            <BellRing className="h-3 w-3 mr-1.5" />
+            Prévenir client
+         </Button>
+         
+         <div className="flex gap-2">
             <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary">
                 <MessageSquare className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={handleNotifyClient} title="Prévenir client">
-                <BellRing className="h-4 w-4" />
-            </Button>
-         </div>
-         <Link href={`/intervention/${intervention.id}`}>
+            <Link href={`/intervention/${intervention.id}`}>
             <Button size="sm" className="gap-2 text-xs h-8">
                {intervention.status === "todo" ? (
                    <>
