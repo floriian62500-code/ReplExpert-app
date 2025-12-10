@@ -110,6 +110,7 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
                )}
             </Button>
          </Link>
+         </div>
       </CardFooter>
     </Card>
   );
