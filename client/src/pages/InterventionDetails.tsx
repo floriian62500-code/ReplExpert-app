@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
+import { ChatSheet } from "@/components/chat/ChatSheet";
+
 export default function InterventionDetails() {
   const [, params] = useRoute("/intervention/:id");
   const { toast } = useToast();
@@ -47,9 +49,11 @@ export default function InterventionDetails() {
              <p className="text-xs text-muted-foreground truncate">{intervention.clientName}</p>
           </div>
           <div className="flex space-x-2">
-             <Button variant="ghost" size="icon" className="text-primary">
-               <MessageSquare className="h-5 w-5" />
-             </Button>
+             <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
+                <Button variant="ghost" size="icon" className="text-primary">
+                   <MessageSquare className="h-5 w-5" />
+                </Button>
+             } />
           </div>
         </div>
       </div>

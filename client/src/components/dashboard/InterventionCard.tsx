@@ -7,6 +7,8 @@ import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
+import { ChatSheet } from "@/components/chat/ChatSheet";
+
 interface InterventionCardProps {
   intervention: Intervention;
 }
@@ -92,9 +94,12 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
          </Button>
          
          <div className="flex gap-2">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                <MessageSquare className="h-4 w-4" />
-            </Button>
+            <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                    <MessageSquare className="h-4 w-4" />
+                </Button>
+            } />
+            
             <Link href={`/intervention/${intervention.id}`}>
             <Button size="sm" className="gap-2 text-xs h-8">
                {intervention.status === "todo" ? (
