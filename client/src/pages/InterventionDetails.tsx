@@ -1,10 +1,9 @@
 import { Layout } from "@/components/layout/Layout";
 import { useRoute } from "wouter";
-import { MOCK_INTERVENTIONS, TRADE_ICONS, TRADE_LABELS, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
+import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
@@ -16,7 +15,8 @@ export default function InterventionDetails() {
 
   if (!intervention) return <div>Intervention non trouvée</div>;
 
-  const TradeIcon = TRADE_ICONS[intervention.types[0]];
+  const tradeType = intervention.types[0];
+  const config = TRADE_CONFIG[tradeType] || TRADE_CONFIG["plomberie"];
 
   return (
     <Layout>
@@ -59,20 +59,28 @@ export default function InterventionDetails() {
         <div className="px-4 -mt-6 relative z-10 space-y-6">
             
             {/* Main Info Card */}
-            <Card className="shadow-lg border-none">
-                <CardContent className="p-5 space-y-4">
+            <Card className="shadow-lg border-none overflow-hidden">
+                <div className={cn("h-2 w-full", config.bgColor.replace("bg-", "bg-"))} style={{backgroundColor: "currentColor"}} />
+                <CardContent className="p-5 space-y-4 pt-6">
                     <div className="flex justify-between items-start">
                         <div>
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-2">
                                 <Badge variant="outline" className={cn("text-[10px] font-medium border", CRM_TYPE_COLORS[intervention.crmType])}>
                                     {CRM_TYPE_LABELS[intervention.crmType]}
+                                </Badge>
+                                <Badge variant="outline" className={cn("text-[10px] font-medium border bg-white", config.color, "border-current opacity-80")}>
+                                   {config.label}
                                 </Badge>
                             </div>
                             <h2 className="text-xl font-bold">{intervention.clientName}</h2>
                             <p className="text-muted-foreground text-sm uppercase font-medium tracking-wide">{intervention.clientType}</p>
                         </div>
-                        <div className="p-2 bg-primary/10 rounded-full text-primary">
-                            {TradeIcon && <TradeIcon className="h-6 w-6" />}
+                        <div className="h-16 w-16 rounded-full overflow-hidden shadow-md shrink-0 border-2 border-white">
+                            <img 
+                                src={config.icon} 
+                                alt={config.label} 
+                                className="h-full w-full object-cover"
+                            />
                         </div>
                     </div>
                     
@@ -99,14 +107,6 @@ export default function InterventionDetails() {
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                             <p className="text-sm font-medium text-primary underline">06 12 34 56 78</p>
                          </div>
-                    </div>
-
-                    <div className="flex gap-2 flex-wrap">
-                        {intervention.types.map(t => (
-                            <Badge key={t} variant="secondary" className="font-normal">
-                                {TRADE_LABELS[t]}
-                            </Badge>
-                        ))}
                     </div>
                 </CardContent>
             </Card>

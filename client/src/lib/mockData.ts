@@ -12,6 +12,16 @@ import {
   BrickWall 
 } from "lucide-react";
 
+// Imports des pictogrammes
+import pictoMenuiserie from "@assets/PICTO_MENUISERIE_1765373201530.png";
+import pictoPlomberie from "@assets/PICTO_PLOMBERIE_1765373201531.png";
+import pictoPMR from "@assets/PICTO_PMR_1765373201531.png";
+import pictoRenovation from "@assets/PICTO_RENOVATION_1765373201531.png";
+import pictoVR from "@assets/PICTO_VR_1765373201531.png";
+import pictoSerrurerie from "@assets/PICTO_SERRURERIE_1765373201532.png";
+import pictoVitrerie from "@assets/PICTO_VITRERIE_1765373201532.png";
+import pictoElec from "@assets/PICTO_ELEC_1765373201533.png";
+
 export type InterventionStatus = "todo" | "in_progress" | "done";
 
 export interface Intervention {
@@ -25,7 +35,7 @@ export interface Intervention {
   types: string[]; // e.g., ["plomberie", "vitrerie"]
   status: InterventionStatus;
   description: string;
-  reportStatus?: "pending" | "submitted"; // New field for report status
+  reportStatus?: "pending" | "submitted";
   crmType: "a_definir" | "travaux" | "rdf";
 }
 
@@ -175,30 +185,74 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
   }
 ];
 
-export const TRADE_ICONS: Record<string, LucideIcon> = {
-  plomberie: Droplet,
-  vitrerie: Maximize2,
-  menuiserie: Hammer,
-  electricite: Zap,
-  platrerie: BrickWall,
-  peinture: PaintBucket,
-  isolation: Thermometer,
-  "volet roulant": Blinds,
-  serrurerie: Key,
-  chauffage: Thermometer // Using thermometer for heating too
-};
+export interface TradeConfig {
+  label: string;
+  icon: string; // URL/Path to image
+  color: string; // Tailwind color class for text/border
+  bgColor: string; // Tailwind color class for background
+}
 
-export const TRADE_LABELS: Record<string, string> = {
-  plomberie: "Plomberie",
-  vitrerie: "Vitrerie",
-  menuiserie: "Menuiserie",
-  electricite: "Électricité",
-  platrerie: "Plâtrerie",
-  peinture: "Peinture",
-  isolation: "Isolation",
-  "volet roulant": "Volet Roulant",
-  serrurerie: "Serrurerie",
-  chauffage: "Chauffage"
+export const TRADE_CONFIG: Record<string, TradeConfig> = {
+  plomberie: {
+    label: "Plomberie",
+    icon: pictoPlomberie,
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-100"
+  },
+  vitrerie: {
+    label: "Vitrerie",
+    icon: pictoVitrerie,
+    color: "text-green-600",
+    bgColor: "bg-green-100"
+  },
+  menuiserie: {
+    label: "Menuiserie",
+    icon: pictoMenuiserie,
+    color: "text-orange-600",
+    bgColor: "bg-orange-100"
+  },
+  electricite: {
+    label: "Électricité",
+    icon: pictoElec,
+    color: "text-amber-500",
+    bgColor: "bg-amber-100"
+  },
+  platrerie: {
+    label: "Plâtrerie",
+    icon: pictoRenovation,
+    color: "text-stone-600",
+    bgColor: "bg-stone-100"
+  },
+  peinture: {
+    label: "Peinture",
+    icon: pictoRenovation,
+    color: "text-stone-600",
+    bgColor: "bg-stone-100"
+  },
+  isolation: {
+    label: "Isolation",
+    icon: pictoPMR, // Using PMR/Adaptation picto as fallback or if appropriate
+    color: "text-blue-600",
+    bgColor: "bg-blue-100"
+  },
+  "volet roulant": {
+    label: "Volet Roulant",
+    icon: pictoVR,
+    color: "text-purple-600",
+    bgColor: "bg-purple-100"
+  },
+  serrurerie: {
+    label: "Serrurerie",
+    icon: pictoSerrurerie,
+    color: "text-pink-600",
+    bgColor: "bg-pink-100"
+  },
+  chauffage: {
+    label: "Chauffage",
+    icon: pictoPlomberie, // Fallback
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-100"
+  }
 };
 
 export const TODOS = [
