@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Calendar, Briefcase, User } from "lucide-react";
+import { Home, History, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {
@@ -7,6 +7,8 @@ export function BottomNav() {
 
   const navItems = [
     { icon: Home, label: "Accueil", path: "/" },
+    { icon: History, label: "Historique", path: "/history" },
+    { icon: Users, label: "Espace RH", path: "/hr" },
     { icon: User, label: "Compte", path: "/profile" },
   ];
 

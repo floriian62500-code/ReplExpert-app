@@ -22,22 +22,6 @@ export default function Dashboard() {
           <StatCard technician={MOCK_TECHNICIAN} />
         </section>
 
-        {/* Quick Links Grid */}
-        <section className="grid grid-cols-2 gap-3">
-            <Link href="/history">
-                <Button variant="outline" className="w-full h-12 justify-start gap-2 bg-white/50 border-dashed">
-                    <History className="h-4 w-4 text-primary" />
-                    Historique
-                </Button>
-            </Link>
-            <Link href="/hr">
-                <Button variant="outline" className="w-full h-12 justify-start gap-2 bg-white/50 border-dashed">
-                    <Users className="h-4 w-4 text-primary" />
-                    Espace RH
-                </Button>
-            </Link>
-        </section>
-
         {/* Interventions of the day */}
         <section>
           <div className="flex items-center justify-between mb-3">
