@@ -74,6 +74,11 @@ export default function InterventionDetails() {
   // RDF Report State
   const [rdfNotes, setRdfNotes] = useState("");
   const [rdfMeasurements, setRdfMeasurements] = useState("");
+  
+  // Specific RDF State
+  const [rdfSpecific1, setRdfSpecific1] = useState(""); // Generic slot 1
+  const [rdfSpecific2, setRdfSpecific2] = useState(""); // Generic slot 2
+  const [rdfSpecific3, setRdfSpecific3] = useState(""); // Generic slot 3
 
   const handleNotifyClient = () => {
     toast({
@@ -368,16 +373,170 @@ export default function InterventionDetails() {
                             />
                         </div>
 
-                        {/* Prise de cotes */}
+                        {/* Specific Fields based on Trade */}
+                        <div className="space-y-4 border-l-2 border-purple-100 pl-4 py-2">
+                            <h4 className="font-semibold text-sm text-purple-700 uppercase tracking-wide mb-3">
+                                Spécifique {TRADE_CONFIG[primaryType]?.label || "Métier"}
+                            </h4>
+
+                            {primaryType === 'plomberie' && (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Type de fuite / Panne</Label>
+                                        <Select onValueChange={setRdfSpecific1}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Sélectionner..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="fuite_joint">Fuite sur joint</SelectItem>
+                                                <SelectItem value="fuite_canalisation">Rupture canalisation</SelectItem>
+                                                <SelectItem value="wc_hs">Mécanisme WC HS</SelectItem>
+                                                <SelectItem value="robinet_hs">Robinetterie à remplacer</SelectItem>
+                                                <SelectItem value="bouchon">Engorgement / Bouchon</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm">Matériau</Label>
+                                            <Select onValueChange={setRdfSpecific2}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Cuivre/PVC..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="cuivre">Cuivre</SelectItem>
+                                                    <SelectItem value="pvc">PVC</SelectItem>
+                                                    <SelectItem value="per">PER</SelectItem>
+                                                    <SelectItem value="multicouche">Multicouche</SelectItem>
+                                                    <SelectItem value="acier">Acier</SelectItem>
+                                                    <SelectItem value="plomb">Plomb</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-sm">Diamètre (mm)</Label>
+                                            <Input placeholder="ex: 14, 32, 40" value={rdfSpecific3} onChange={(e) => setRdfSpecific3(e.target.value)} />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {primaryType === 'serrurerie' && (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Type de serrure</Label>
+                                        <Select onValueChange={setRdfSpecific1}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Sélectionner..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="monopoint">Monopoint</SelectItem>
+                                                <SelectItem value="3_points">3 points applique</SelectItem>
+                                                <SelectItem value="3_points_encastre">3 points encastré</SelectItem>
+                                                <SelectItem value="5_points">5 points</SelectItem>
+                                                <SelectItem value="carennee">Carénée</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Dimensions Cylindre (mm)</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Input placeholder="Ext." className="w-20" />
+                                            <span>x</span>
+                                            <Input placeholder="Int." className="w-20" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Marque</Label>
+                                        <Input placeholder="Vachette, Bricard, Picard..." value={rdfSpecific2} onChange={(e) => setRdfSpecific2(e.target.value)} />
+                                    </div>
+                                </>
+                            )}
+
+                            {primaryType === 'vitrerie' && (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Type de vitrage</Label>
+                                        <Select onValueChange={setRdfSpecific1}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Sélectionner..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="simple">Simple vitrage</SelectItem>
+                                                <SelectItem value="double">Double vitrage 4/16/4</SelectItem>
+                                                <SelectItem value="securit">Verre Sécurit</SelectItem>
+                                                <SelectItem value="feuillete">Feuilleté (Stadip)</SelectItem>
+                                                <SelectItem value="arme">Verre armé</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Dimensions Clair de jour (mm)</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Input placeholder="Largeur" />
+                                            <span>x</span>
+                                            <Input placeholder="Hauteur" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Épaisseur totale</Label>
+                                        <Input placeholder="ex: 24mm" value={rdfSpecific2} onChange={(e) => setRdfSpecific2(e.target.value)} />
+                                    </div>
+                                </>
+                            )}
+                            
+                            {primaryType === 'electricite' && (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Type d'intervention</Label>
+                                        <Select onValueChange={setRdfSpecific1}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Sélectionner..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="panne_totale">Panne totale</SelectItem>
+                                                <SelectItem value="panne_partielle">Panne partielle (1 circuit)</SelectItem>
+                                                <SelectItem value="tableau">Tableau électrique</SelectItem>
+                                                <SelectItem value="appareillage">Prise / Interrupteur</SelectItem>
+                                                <SelectItem value="eclairage">Éclairage</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Installation</Label>
+                                        <RadioGroup defaultValue="monophase" className="flex gap-4">
+                                            <div className="flex items-center space-x-2">
+                                                <RadioGroupItem value="monophase" id="mono" />
+                                                <Label htmlFor="mono">Monophasé</Label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <RadioGroupItem value="triphase" id="tri" />
+                                                <Label htmlFor="tri">Triphasé</Label>
+                                            </div>
+                                        </RadioGroup>
+                                    </div>
+                                </>
+                            )}
+
+                             {/* Default / Fallback */}
+                            {!['plomberie', 'serrurerie', 'vitrerie', 'electricite'].includes(primaryType) && (
+                                <div className="p-3 bg-muted/50 rounded text-sm text-muted-foreground italic">
+                                    Utilisez la zone de prise de cotes libre ci-dessous pour ce métier.
+                                </div>
+                            )}
+
+                        </div>
+
+                        {/* Prise de cotes (Generic fallback/addition) */}
                         <div className="space-y-2">
                             <Label className="font-semibold flex items-center gap-2">
-                                <Ruler className="h-4 w-4" /> Prise de cotes / Mesures
+                                <Ruler className="h-4 w-4" /> Prise de cotes / Notes complémentaires
                             </Label>
                             <Textarea 
-                                placeholder="Dimensions, références..." 
+                                placeholder="Dimensions, références supplémentaires, accès..." 
                                 value={rdfMeasurements}
                                 onChange={(e) => setRdfMeasurements(e.target.value)}
-                                className="min-h-[120px] font-mono text-sm"
+                                className="min-h-[100px] font-mono text-sm"
                             />
                         </div>
                         
