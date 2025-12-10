@@ -90,8 +90,13 @@ export default function InterventionDetails() {
   };
   
   const handleStartIntervention = () => {
+      console.log("Starting intervention...");
       setStatus("in_progress");
-      handleNotifyClient();
+      try {
+        handleNotifyClient();
+      } catch (e) {
+        console.error("Error notifying client:", e);
+      }
   };
 
   const handleFinishIntervention = () => {
@@ -1116,7 +1121,7 @@ export default function InterventionDetails() {
       {/* Floating Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
          <div className="flex gap-3">
-            {status === "in_progress" ? (
+            {status === "in_progress" && (
                 <>
                     <Button variant="outline" className="flex-1 h-12 border-orange-200 text-orange-600 hover:text-orange-700 hover:bg-orange-50">
                         <Pause className="h-5 w-5 mr-2" /> Pause
@@ -1128,7 +1133,9 @@ export default function InterventionDetails() {
                         <CheckSquare className="h-5 w-5 mr-2" /> Terminer
                     </Button>
                 </>
-            ) : status === "todo" && (
+            )}
+
+            {status === "todo" && (
                 <div className="flex w-full gap-3">
                     <Drawer>
                         <DrawerTrigger asChild>
