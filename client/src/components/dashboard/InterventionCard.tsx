@@ -53,13 +53,13 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground line-clamp-1">{intervention.clientName}</p>
-              <div className="flex gap-2 mt-1 flex-wrap">
+              <div className="flex gap-2 mt-1 flex-wrap items-center">
                  {intervention.types.map(type => (
                      <Badge key={type} variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border bg-white", TRADE_CONFIG[type]?.color, "border-current opacity-80")}>
                         {TRADE_CONFIG[type]?.label}
                      </Badge>
                  ))}
-                 <Badge variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border", CRM_TYPE_COLORS[intervention.crmType])}>
+                 <Badge variant="outline" className={cn("text-xs py-0.5 px-2 h-6 font-bold uppercase tracking-wider border-2 shadow-sm", CRM_TYPE_COLORS[intervention.crmType])}>
                     {CRM_TYPE_LABELS[intervention.crmType]}
                  </Badge>
               </div>
@@ -91,24 +91,17 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
             <span className="line-clamp-2">{intervention.description}</span>
           </div>
 
-          {/* Matériel (si applicable) */}
-          <div className="mt-3 text-xs text-muted-foreground bg-muted/50 p-2 rounded border border-dashed">
-            <span className="font-semibold text-foreground block mb-1">Motif :</span>
-            <span className="line-clamp-2">{intervention.description}</span>
-          </div>
-
           <div className={cn(
              "mt-2 text-xs p-2 rounded border flex flex-col gap-1",
-             intervention.materialsStatus === "provided" ? "bg-green-50 border-green-200 text-green-700" : 
-             intervention.materialsStatus === "to_buy" ? "bg-orange-50 border-orange-200 text-orange-700" :
-             "bg-muted/30 border-muted text-muted-foreground"
+             // Logic: Green if supplies needed (provided or to_buy), Red if none needed
+             intervention.materialsStatus === "none" ? "bg-red-50 border-red-200 text-red-700" :
+             "bg-green-50 border-green-200 text-green-700"
           )}>
              <div className="flex items-center gap-2 font-medium">
                  <Package className="h-3 w-3 shrink-0" />
                  <span className="line-clamp-1">
-                    {intervention.materialsStatus === "provided" ? "Matériel fourni" : 
-                     intervention.materialsStatus === "to_buy" ? "Matériel à acheter" :
-                     "Aucune fourniture requise"}
+                    {intervention.materialsStatus === "none" ? "Aucune fourniture requise" : 
+                     intervention.materialsStatus === "provided" ? "Matériel fourni" : "Matériel à acheter"}
                  </span>
              </div>
              {intervention.materialsList && (
@@ -127,14 +120,15 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
          
          <div className="flex gap-2">
             <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
-                <Button size="sm" variant="outline" className={cn(
-                    "gap-2 relative",
-                    intervention.id === "int-101" && "border-blue-300 bg-blue-50 text-blue-700 animate-pulse" // Mock notification for demo
+                <Button size="icon" variant="outline" className={cn(
+                    "h-8 w-8 relative",
+                    intervention.id === "int-101" && "border-blue-300 bg-blue-50 text-blue-700"
                 )}>
                     <MessageSquare className="h-4 w-4" />
-                    <span className="hidden sm:inline">Message</span>
                     {intervention.id === "int-101" && (
-                        <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white" />
+                        <span className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 rounded-full border-2 border-white text-[10px] text-white flex items-center justify-center font-bold">
+                            2
+                        </span>
                     )}
                 </Button>
             } />
