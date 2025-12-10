@@ -4,7 +4,7 @@ import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MAT
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -250,20 +250,60 @@ export default function InterventionDetails() {
                 </TabsContent>
 
                 <TabsContent value="docs" className="space-y-3 mt-4">
-                    <Card className="border-dashed border-2">
-                        <CardContent className="flex flex-col items-center justify-center py-8 gap-2">
-                            <div className="bg-muted p-3 rounded-full">
-                                <Upload className="h-6 w-6 text-muted-foreground" />
+                    {/* Documents List */}
+                    <div className="space-y-2">
+                        {/* Devis */}
+                        <Card className="overflow-hidden">
+                            <div className="flex items-center p-3 gap-3">
+                                <div className="bg-blue-100 p-2 rounded-lg shrink-0">
+                                    <FileText className="h-5 w-5 text-blue-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate">Devis sans prix</p>
+                                    <p className="text-xs text-muted-foreground">PDF • 1.2 MB</p>
+                                </div>
+                                <Button size="icon" variant="ghost" className="shrink-0 text-muted-foreground">
+                                    <Eye className="h-4 w-4" />
+                                </Button>
                             </div>
-                            <div className="text-center">
-                                <p className="text-sm font-medium">Aucun document</p>
-                                <p className="text-xs text-muted-foreground">Ajouter un plan, un devis, etc.</p>
+                        </Card>
+
+                        {/* Relevé Technique (RT) */}
+                        <Card className="overflow-hidden">
+                            <div className="flex items-center p-3 gap-3">
+                                <div className="bg-purple-100 p-2 rounded-lg shrink-0">
+                                    <FileCheck className="h-5 w-5 text-purple-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate">Relevé Technique (RT)</p>
+                                    <p className="text-xs text-muted-foreground">Document à compléter</p>
+                                </div>
+                                <Button size="icon" variant="ghost" className="shrink-0 text-muted-foreground">
+                                    <Eye className="h-4 w-4" />
+                                </Button>
                             </div>
-                            <Button size="sm" variant="outline" className="mt-2">
-                                <Upload className="mr-2 h-4 w-4" /> Importer
-                            </Button>
-                        </CardContent>
-                    </Card>
+                        </Card>
+
+                        {/* Commande */}
+                        <Card className="overflow-hidden">
+                            <div className="flex items-center p-3 gap-3">
+                                <div className="bg-orange-100 p-2 rounded-lg shrink-0">
+                                    <ShoppingCart className="h-5 w-5 text-orange-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate">Bon de Commande</p>
+                                    <p className="text-xs text-muted-foreground">Matériel validé</p>
+                                </div>
+                                <Button size="icon" variant="ghost" className="shrink-0 text-muted-foreground">
+                                    <Eye className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </Card>
+                    </div>
+
+                    <Button size="sm" variant="outline" className="w-full mt-2 border-dashed">
+                        <Upload className="mr-2 h-4 w-4" /> Ajouter un autre document
+                    </Button>
                 </TabsContent>
             </Tabs>
 
