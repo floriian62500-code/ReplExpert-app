@@ -44,14 +44,17 @@ export function ChatSheet({ trigger, context = "Bureau", open, onOpenChange }: C
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[80vh] flex flex-col p-0 rounded-t-xl">
         <SheetHeader className="p-4 border-b">
-          <SheetTitle className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
+          <SheetTitle className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 border border-border">
                 <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=Bureau" />
                 <AvatarFallback>BU</AvatarFallback>
             </Avatar>
             <div>
-                <span className="block text-sm font-bold">Discussion {context}</span>
-                <span className="block text-xs font-normal text-muted-foreground">En ligne</span>
+                <span className="block text-base font-bold">Discussion {context}</span>
+                <span className="block text-xs font-normal text-muted-foreground flex items-center gap-1">
+                   <span className="h-2 w-2 bg-green-500 rounded-full inline-block animate-pulse"></span>
+                   En ligne
+                </span>
             </div>
           </SheetTitle>
         </SheetHeader>

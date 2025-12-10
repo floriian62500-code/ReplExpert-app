@@ -5,8 +5,9 @@ import { InterventionCard } from "@/components/dashboard/InterventionCard";
 import { ActionList } from "@/components/dashboard/ActionList";
 import { MOCK_TECHNICIAN, MOCK_INTERVENTIONS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, History, Users } from "lucide-react";
+import { ArrowRight, History, Users, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
+import { ChatSheet } from "@/components/chat/ChatSheet";
 
 export default function Dashboard() {
   const todaysInterventions = MOCK_INTERVENTIONS.filter(i => i.date === new Date().toISOString().split('T')[0]);
@@ -20,6 +21,16 @@ export default function Dashboard() {
         {/* CA Block */}
         <section>
           <StatCard technician={MOCK_TECHNICIAN} />
+        </section>
+
+        {/* Quick Actions - New */}
+        <section className="grid grid-cols-1">
+            <ChatSheet context="Bureau" trigger={
+                <Button variant="outline" className="w-full bg-white shadow-sm border-dashed border-primary/20 text-primary h-12 gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    Contacter le bureau
+                </Button>
+            } />
         </section>
 
         {/* Interventions of the day */}
