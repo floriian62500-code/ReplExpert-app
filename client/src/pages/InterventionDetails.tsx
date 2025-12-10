@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { useRoute } from "wouter";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench, Plus, Trash2, Receipt, PenLine, Minus } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench, Plus, Trash2, Receipt, PenLine, Minus, Ruler } from "lucide-react";
 import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MATERIALS_LABELS, MOCK_ARTICLES } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -56,6 +56,7 @@ export default function InterventionDetails() {
   const [currentCrmType, setCurrentCrmType] = useState(intervention.crmType);
   const [showTypeSelection, setShowTypeSelection] = useState(false);
   const [showDepannageReport, setShowDepannageReport] = useState(false);
+  const [showRDFReport, setShowRDFReport] = useState(false);
   
   // Depannage Report State
   const [diagnostic, setDiagnostic] = useState("");
@@ -68,6 +69,10 @@ export default function InterventionDetails() {
   const [isAddingArticle, setIsAddingArticle] = useState(false);
   const [signature, setSignature] = useState(false); // Mock signature state
   const [showFinishDialog, setShowFinishDialog] = useState(false);
+  
+  // RDF Report State
+  const [rdfNotes, setRdfNotes] = useState("");
+  const [rdfMeasurements, setRdfMeasurements] = useState("");
 
   const handleNotifyClient = () => {
     toast({
@@ -105,6 +110,7 @@ export default function InterventionDetails() {
             title: "Type d'intervention défini",
             description: `Mode Relevé Technique activé.`,
         });
+        setShowRDFReport(true);
         setTimeout(handleNotifyClient, 500);
       }
   };
@@ -313,7 +319,83 @@ export default function InterventionDetails() {
                         }} 
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                        Valider le rapport
+                        Valider et Terminer
+                    </Button>
+                    <DrawerClose asChild>
+                        <Button variant="outline">Annuler</Button>
+                    </DrawerClose>
+                </DrawerFooter>
+            </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* RDF (Relevé Technique) Drawer */}
+      <Drawer open={showRDFReport} onOpenChange={setShowRDFReport}>
+        <DrawerContent className="h-[90vh]">
+            <div className="mx-auto w-full max-w-lg h-full flex flex-col">
+                <DrawerHeader>
+                    <DrawerTitle className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-purple-600" />
+                        Relevé Technique
+                    </DrawerTitle>
+                </DrawerHeader>
+                
+                <ScrollArea className="flex-1 px-4">
+                    <div className="space-y-6 pb-6">
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 mb-4">
+                            <p className="text-sm text-purple-800">
+                                <Info className="h-4 w-4 inline mr-2" />
+                                Prenez les mesures et photos nécessaires pour l'établissement du devis.
+                            </p>
+                        </div>
+
+                        {/* Description */}
+                        <div className="space-y-2">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <Info className="h-4 w-4" /> Description du besoin
+                            </Label>
+                            <Textarea 
+                                placeholder="Que souhaite le client ?" 
+                                value={rdfNotes}
+                                onChange={(e) => setRdfNotes(e.target.value)}
+                                className="min-h-[80px]"
+                            />
+                        </div>
+
+                        {/* Prise de cotes */}
+                        <div className="space-y-2">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <Ruler className="h-4 w-4" /> Prise de cotes / Mesures
+                            </Label>
+                            <Textarea 
+                                placeholder="Dimensions, références..." 
+                                value={rdfMeasurements}
+                                onChange={(e) => setRdfMeasurements(e.target.value)}
+                                className="min-h-[120px] font-mono text-sm"
+                            />
+                        </div>
+                        
+                         {/* Photos Placeholder */}
+                         <div className="space-y-2">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <Camera className="h-4 w-4" /> Photos
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="aspect-square bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/20 cursor-pointer hover:bg-muted/80">
+                                    <Plus className="h-6 w-6 text-muted-foreground" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </ScrollArea>
+
+                <DrawerFooter className="border-t pt-4">
+                    <Button onClick={() => {
+                        setShowRDFReport(false);
+                        toast({ title: "Relevé enregistré", description: "Les informations ont été transmises au bureau des devis." });
+                    }} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                        Transmettre au Bureau
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Annuler</Button>
@@ -326,40 +408,41 @@ export default function InterventionDetails() {
       <Dialog open={showFinishDialog} onOpenChange={setShowFinishDialog}>
         <DialogContent className="sm:max-w-md">
             <div className="flex flex-col items-center gap-4 py-4 text-center">
-                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                    <CheckSquare className="h-6 w-6 text-green-600" />
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Info className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">L'intervention est-elle terminée ?</h3>
+                    <h3 className="text-lg font-semibold">Devis complémentaire à réaliser ?</h3>
                     <p className="text-sm text-muted-foreground">
-                        Confirmez si le problème est résolu ou si un devis complémentaire est nécessaire.
+                        Y a-t-il des travaux supplémentaires nécessitant un devis ?
                     </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 w-full mt-2">
                     <Button 
-                        className="h-24 flex flex-col gap-2 bg-green-600 hover:bg-green-700 text-white"
+                        variant="outline"
+                        className="h-24 flex flex-col gap-2 hover:bg-gray-100"
                         onClick={() => {
                             setShowFinishDialog(false);
                             setShowDepannageReport(false);
-                            toast({ title: "Intervention terminée", description: "La facturette a été envoyée au client." });
+                            toast({ title: "Dossier clôturé", description: "Intervention terminée sans suite." });
                         }}
                     >
-                        <CheckSquare className="h-6 w-6" />
-                        <span className="font-semibold">Terminée</span>
-                        <span className="text-xs text-white/80 font-normal">Facturer et clôturer</span>
+                        <Ban className="h-6 w-6 text-gray-500" />
+                        <span className="font-semibold">Non</span>
+                        <span className="text-xs text-muted-foreground font-normal">Clôturer le dossier</span>
                     </Button>
                     <Button 
-                        variant="outline" 
-                        className="h-24 flex flex-col gap-2 hover:border-orange-500 hover:bg-orange-50 hover:text-orange-700"
+                        className="h-24 flex flex-col gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                         onClick={() => {
                             setShowFinishDialog(false);
                             setShowDepannageReport(false);
-                            toast({ title: "Demande de devis", description: "Transmis au bureau pour chiffrage complémentaire." });
+                            // Open RDF module
+                            setTimeout(() => setShowRDFReport(true), 300);
                         }}
                     >
-                        <FileText className="h-6 w-6 text-orange-600" />
-                        <span className="font-semibold">Devis à faire</span>
-                        <span className="text-xs text-muted-foreground font-normal">Suite à donner</span>
+                        <FileText className="h-6 w-6" />
+                        <span className="font-semibold">Oui</span>
+                        <span className="text-xs text-white/80 font-normal">Ouvrir Relevé Tech.</span>
                     </Button>
                 </div>
             </div>
