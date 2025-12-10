@@ -19,11 +19,27 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { X } from "lucide-react";
+
+// Stock images
+import stockLeakRepair from "@assets/stock_images/plumbing_under_sink__edbe1fe8.jpg";
+import stockFaucetNew from "@assets/stock_images/new_kitchen_sink_fau_fbbe7b23.jpg";
+
 export default function InterventionDetails() {
   const [, params] = useRoute("/intervention/:id");
   const { toast } = useToast();
   const intervention = MOCK_INTERVENTIONS.find(i => i.id === params?.id);
   const [cancelReason, setCancelReason] = useState("client_absent");
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
+  // Mock state for photos
+  const [photosBefore, setPhotosBefore] = useState([
+      { id: 1, url: stockLeakRepair, room: "cuisine" }
+  ]);
+  const [photosAfter, setPhotosAfter] = useState([
+      { id: 2, url: stockFaucetNew, room: "cuisine" }
+  ]);
 
   if (!intervention) return <div>Intervention non trouvée</div>;
 
@@ -60,6 +76,34 @@ export default function InterventionDetails() {
   return (
     <Layout>
       {/* Custom Header for Detail View */}
+      <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
+        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-black/90 border-none h-full md:h-auto flex flex-col justify-center">
+            <div className="relative w-full h-full flex items-center justify-center">
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-4 right-4 text-white z-50 hover:bg-white/20" 
+                    onClick={() => setSelectedPhoto(null)}
+                >
+                    <X className="h-6 w-6" />
+                    <span className="sr-only">Fermer</span>
+                </Button>
+                {selectedPhoto && (
+                    <img 
+                        src={selectedPhoto} 
+                        alt="Photo en grand" 
+                        className="max-h-[80vh] w-auto object-contain"
+                    />
+                )}
+            </div>
+            <div className="p-4 text-center">
+                <Button variant="outline" className="w-full max-w-xs mx-auto" onClick={() => setSelectedPhoto(null)}>
+                    Retour
+                </Button>
+            </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="sticky top-0 z-40 w-full bg-background/95 backdrop-blur border-b border-border pt-safe">
         <div className="flex items-center px-4 h-14 space-x-4">
           <Link href="/">
@@ -254,8 +298,27 @@ export default function InterventionDetails() {
                                 <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-md border border-orange-200">AVANT</span>
                                 Travaux
                             </h3>
-                            <span className="text-xs text-muted-foreground">0 photos</span>
+                            <span className="text-xs text-muted-foreground">{photosBefore.length} photos</span>
                         </div>
+                        
+                        {/* Photos Grid Avant */}
+                        {photosBefore.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2">
+                                {photosBefore.map(photo => (
+                                    <div 
+                                        key={photo.id} 
+                                        className="aspect-square rounded-md overflow-hidden relative cursor-pointer border border-border"
+                                        onClick={() => setSelectedPhoto(photo.url)}
+                                    >
+                                        <img src={photo.url} className="w-full h-full object-cover" alt="Avant travaux" />
+                                        <Badge className="absolute bottom-1 right-1 text-[10px] px-1 h-4 bg-black/60 hover:bg-black/70 backdrop-blur-sm border-none text-white">
+                                            {photo.room}
+                                        </Badge>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <Card className="border-dashed border-2 bg-muted/10">
                             <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
                                 <div className="bg-muted p-3 rounded-full">
@@ -292,8 +355,27 @@ export default function InterventionDetails() {
                                 <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-md border border-green-200">APRÈS</span>
                                 Travaux
                             </h3>
-                            <span className="text-xs text-muted-foreground">0 photos</span>
+                            <span className="text-xs text-muted-foreground">{photosAfter.length} photos</span>
                         </div>
+
+                        {/* Photos Grid Après */}
+                        {photosAfter.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2">
+                                {photosAfter.map(photo => (
+                                    <div 
+                                        key={photo.id} 
+                                        className="aspect-square rounded-md overflow-hidden relative cursor-pointer border border-border"
+                                        onClick={() => setSelectedPhoto(photo.url)}
+                                    >
+                                        <img src={photo.url} className="w-full h-full object-cover" alt="Après travaux" />
+                                        <Badge className="absolute bottom-1 right-1 text-[10px] px-1 h-4 bg-black/60 hover:bg-black/70 backdrop-blur-sm border-none text-white">
+                                            {photo.room}
+                                        </Badge>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <Card className="border-dashed border-2 bg-muted/10">
                             <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
                                 <div className="bg-muted p-3 rounded-full">
