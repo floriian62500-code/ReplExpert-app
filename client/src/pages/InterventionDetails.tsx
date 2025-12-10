@@ -94,8 +94,17 @@ export default function InterventionDetails() {
   
   const handleStartIntervention = () => {
       setStatus("in_progress");
-      // SMS notification removed as requested
-      // handleNotifyClient();
+      
+      // If intervention is "a_definir", prompt immediately as requested
+      if (currentCrmType === 'a_definir') {
+          setShowTypeSelection(true);
+      } else {
+          toast({
+              title: "Intervention démarrée",
+              description: "Le chronomètre est lancé.",
+              duration: 2000,
+          });
+      }
   };
 
   const handleFinishIntervention = () => {
