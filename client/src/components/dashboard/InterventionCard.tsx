@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Intervention, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
-import { MapPin, Clock, MessageSquare, ArrowRight, Play, BellRing } from "lucide-react";
+import { MapPin, Clock, MessageSquare, ArrowRight, Play, BellRing, Package } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +27,8 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
       duration: 3000,
     });
   };
+
+  const hasMaterials = intervention.materialsStatus && intervention.materialsStatus !== "none";
 
   return (
     <Card className={cn(
@@ -85,6 +87,19 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
             <span className="font-semibold text-foreground block mb-1">Motif :</span>
             <span className="line-clamp-2">{intervention.description}</span>
           </div>
+
+          {/* Matériel (si applicable) */}
+          {hasMaterials && (
+             <div className={cn(
+                 "mt-2 text-xs p-2 rounded border flex items-center gap-2",
+                 intervention.materialsStatus === "provided" ? "bg-green-50 border-green-200 text-green-700" : "bg-orange-50 border-orange-200 text-orange-700"
+             )}>
+                 <Package className="h-3 w-3 shrink-0" />
+                 <span className="font-medium line-clamp-1">
+                    {intervention.materialsStatus === "provided" ? "Matériel fourni" : "Matériel à acheter"}
+                 </span>
+             </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="bg-muted/30 p-2 px-4 flex justify-between items-center border-t border-border gap-2">

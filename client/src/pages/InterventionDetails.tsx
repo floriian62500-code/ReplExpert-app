@@ -4,11 +4,12 @@ import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MAT
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ChatSheet } from "@/components/chat/ChatSheet";
 
@@ -29,6 +30,14 @@ export default function InterventionDetails() {
       description: "Un SMS automatique a été envoyé au client pour signaler votre arrivée.",
       duration: 3000,
     });
+  };
+
+  const handleCantDo = () => {
+      toast({
+          title: "Signalement enregistré",
+          description: "Le bureau a été notifié que vous ne pouvez pas effectuer cette intervention.",
+          variant: "destructive"
+      });
   };
 
   const wazeUrl = `https://www.waze.com/ul?q=${encodeURIComponent(intervention.address + " " + intervention.city)}`;
@@ -205,17 +214,51 @@ export default function InterventionDetails() {
                 </CardContent>
             </Card>
 
-            {/* Actions Grid */}
-            <div className="grid grid-cols-2 gap-3">
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2 border-dashed">
-                    <Camera className="h-6 w-6 text-muted-foreground" />
-                    <span className="text-xs font-medium">Ajouter Photos</span>
-                </Button>
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2 border-dashed">
-                    <FileText className="h-6 w-6 text-muted-foreground" />
-                    <span className="text-xs font-medium">Relevé Technique</span>
-                </Button>
-            </div>
+            {/* Media & Docs Tabs */}
+            <Tabs defaultValue="photos" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="photos" className="gap-2">
+                        <ImageIcon className="h-4 w-4" /> Médiathèque
+                    </TabsTrigger>
+                    <TabsTrigger value="docs" className="gap-2">
+                        <FolderOpen className="h-4 w-4" /> Documents
+                    </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="photos" className="space-y-3 mt-4">
+                    <Card className="border-dashed border-2">
+                        <CardContent className="flex flex-col items-center justify-center py-8 gap-2">
+                            <div className="bg-muted p-3 rounded-full">
+                                <Camera className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-sm font-medium">Aucune photo</p>
+                                <p className="text-xs text-muted-foreground">Prendre une photo de l'intervention</p>
+                            </div>
+                            <Button size="sm" variant="outline" className="mt-2">
+                                <Camera className="mr-2 h-4 w-4" /> Ajouter
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="docs" className="space-y-3 mt-4">
+                    <Card className="border-dashed border-2">
+                        <CardContent className="flex flex-col items-center justify-center py-8 gap-2">
+                            <div className="bg-muted p-3 rounded-full">
+                                <Upload className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-sm font-medium">Aucun document</p>
+                                <p className="text-xs text-muted-foreground">Ajouter un plan, un devis, etc.</p>
+                            </div>
+                            <Button size="sm" variant="outline" className="mt-2">
+                                <Upload className="mr-2 h-4 w-4" /> Importer
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
 
         </div>
       </div>
@@ -224,9 +267,16 @@ export default function InterventionDetails() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
          <div className="flex gap-3">
             {intervention.status === "todo" && (
-                <Button className="w-full h-12 text-base shadow-lg shadow-primary/20 gap-2">
-                    <Play className="h-5 w-5 fill-current" /> Démarrer l'intervention
-                </Button>
+                <>
+                    <Button variant="outline" className="flex-1 h-12 border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm" onClick={handleCantDo}>
+                        <Ban className="h-4 w-4 sm:mr-2 shrink-0" />
+                        <span className="hidden sm:inline">Je ne peux pas</span>
+                        <span className="sm:hidden">Impossible</span>
+                    </Button>
+                    <Button className="flex-[2] h-12 text-base shadow-lg shadow-primary/20 gap-2">
+                        <Play className="h-5 w-5 fill-current" /> Commencer
+                    </Button>
+                </>
             )}
             {intervention.status === "in_progress" && (
                 <>
