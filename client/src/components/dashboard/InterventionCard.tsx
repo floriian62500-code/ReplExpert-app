@@ -2,17 +2,29 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Intervention, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS } from "@/lib/mockData";
-import { MapPin, Clock, MessageSquare, ArrowRight, Play } from "lucide-react";
+import { MapPin, Clock, MessageSquare, ArrowRight, Play, BellRing } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface InterventionCardProps {
   intervention: Intervention;
 }
 
 export function InterventionCard({ intervention }: InterventionCardProps) {
+  const { toast } = useToast();
   const primaryType = intervention.types[0];
   const primaryConfig = TRADE_CONFIG[primaryType] || TRADE_CONFIG["plomberie"];
+
+  const handleNotifyClient = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toast({
+      title: "Client prévenu",
+      description: "SMS envoyé au client pour signaler votre arrivée.",
+      duration: 3000,
+    });
+  };
 
   return (
     <Card className={cn(
@@ -65,12 +77,21 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
             <MapPin className="h-4 w-4 mr-2 mt-0.5 shrink-0" />
             <span className="line-clamp-1">{intervention.address}, {intervention.city}</span>
           </div>
+          
+          {/* Motif d'intervention */}
+          <div className="mt-3 text-xs text-muted-foreground bg-muted/50 p-2 rounded border border-dashed">
+            <span className="font-semibold text-foreground block mb-1">Motif :</span>
+            <span className="line-clamp-2">{intervention.description}</span>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="bg-muted/30 p-2 px-4 flex justify-between items-center border-t border-border">
          <div className="flex space-x-2">
             <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary">
                 <MessageSquare className="h-4 w-4" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={handleNotifyClient} title="Prévenir client">
+                <BellRing className="h-4 w-4" />
             </Button>
          </div>
          <Link href={`/intervention/${intervention.id}`}>
