@@ -652,8 +652,8 @@ export default function InterventionDetails() {
                         onClick={() => selectInterventionType('travaux')}
                     >
                         <Wrench className="h-6 w-6 text-blue-600" />
-                        <span className="font-semibold">Dépanner</span>
-                        <span className="text-xs text-muted-foreground font-normal">Réparation immédiate</span>
+                        <span className="font-semibold">Intervenir</span>
+                        <span className="text-xs text-muted-foreground font-normal">Dépannage / Travaux</span>
                     </Button>
                     <Button 
                         variant="outline" 
@@ -661,8 +661,8 @@ export default function InterventionDetails() {
                         onClick={() => selectInterventionType('rdf')}
                     >
                         <FileText className="h-6 w-6 text-purple-600" />
-                        <span className="font-semibold">Relevé Tech.</span>
-                        <span className="text-xs text-muted-foreground font-normal">Prise de cotes / Devis</span>
+                        <span className="font-semibold">Faire un RT</span>
+                        <span className="text-xs text-muted-foreground font-normal">Relevé Technique</span>
                     </Button>
                 </div>
             </div>
