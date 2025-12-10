@@ -28,8 +28,6 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
     });
   };
 
-  const hasMaterials = intervention.materialsStatus && intervention.materialsStatus !== "none";
-
   return (
     <Card className={cn(
       "border-2 shadow-sm hover:shadow-md transition-shadow",
@@ -94,24 +92,31 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
           </div>
 
           {/* Matériel (si applicable) */}
-          {hasMaterials && (
-             <div className={cn(
-                 "mt-2 text-xs p-2 rounded border flex flex-col gap-1",
-                 intervention.materialsStatus === "provided" ? "bg-green-50 border-green-200 text-green-700" : "bg-orange-50 border-orange-200 text-orange-700"
-             )}>
-                 <div className="flex items-center gap-2 font-medium">
-                     <Package className="h-3 w-3 shrink-0" />
-                     <span className="line-clamp-1">
-                        {intervention.materialsStatus === "provided" ? "Matériel fourni" : "Matériel à acheter"}
-                     </span>
-                 </div>
-                 {intervention.materialsList && (
-                     <p className="opacity-90 pl-5 border-l-2 border-current/30 text-[11px] line-clamp-2">
-                        {intervention.materialsList}
-                     </p>
-                 )}
+          <div className="mt-3 text-xs text-muted-foreground bg-muted/50 p-2 rounded border border-dashed">
+            <span className="font-semibold text-foreground block mb-1">Motif :</span>
+            <span className="line-clamp-2">{intervention.description}</span>
+          </div>
+
+          <div className={cn(
+             "mt-2 text-xs p-2 rounded border flex flex-col gap-1",
+             intervention.materialsStatus === "provided" ? "bg-green-50 border-green-200 text-green-700" : 
+             intervention.materialsStatus === "to_buy" ? "bg-orange-50 border-orange-200 text-orange-700" :
+             "bg-muted/30 border-muted text-muted-foreground"
+          )}>
+             <div className="flex items-center gap-2 font-medium">
+                 <Package className="h-3 w-3 shrink-0" />
+                 <span className="line-clamp-1">
+                    {intervention.materialsStatus === "provided" ? "Matériel fourni" : 
+                     intervention.materialsStatus === "to_buy" ? "Matériel à acheter" :
+                     "Aucune fourniture requise"}
+                 </span>
              </div>
-          )}
+             {intervention.materialsList && (
+                 <p className="opacity-90 pl-5 border-l-2 border-current/30 text-[11px] line-clamp-2">
+                    {intervention.materialsList}
+                 </p>
+             )}
+          </div>
         </div>
       </CardContent>
       <CardFooter className="bg-muted/30 p-2 px-4 flex justify-between items-center border-t border-border gap-2">
