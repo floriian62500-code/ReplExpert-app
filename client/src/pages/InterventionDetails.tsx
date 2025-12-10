@@ -1,10 +1,12 @@
 import { Layout } from "@/components/layout/Layout";
 import { useRoute } from "wouter";
-import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MATERIALS_LABELS } from "@/lib/mockData";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench, Plus, Trash2, Receipt } from "lucide-react";
+import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MATERIALS_LABELS, MOCK_ARTICLES } from "@/lib/mockData";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -50,6 +52,17 @@ export default function InterventionDetails() {
   // Local state for crmType to allow switching in prototype
   const [currentCrmType, setCurrentCrmType] = useState(intervention.crmType);
   const [showTypeSelection, setShowTypeSelection] = useState(false);
+  const [showDepannageReport, setShowDepannageReport] = useState(false);
+  
+  // Depannage Report State
+  const [diagnostic, setDiagnostic] = useState("");
+  const [workDone, setWorkDone] = useState("");
+  const [invoiceItems, setInvoiceItems] = useState([
+      { id: "labor", name: "Main d'oeuvre (1h)", price: 65, quantity: 1, type: "service" },
+      { id: "travel", name: "Déplacement", price: 45, quantity: 1, type: "service" },
+      { id: "supplies", name: "Petites fournitures", price: 15, quantity: 1, type: "service" }
+  ]);
+  const [isAddingArticle, setIsAddingArticle] = useState(false);
 
   const handleNotifyClient = () => {
     toast({
@@ -62,6 +75,15 @@ export default function InterventionDetails() {
   const handleStartIntervention = () => {
       if (currentCrmType === 'a_definir') {
           setShowTypeSelection(true);
+      } else if (currentCrmType === 'travaux') {
+          // If already Travaux, directly open report? 
+          // Or user wants this when clicking "Dépanner" inside the modal.
+          // Assuming user means: if I select "Depanner" -> opens report window.
+          // If status is "todo", usually "Start" moves to "In Progress".
+          // Let's assume for this prototype flow, "Dépanner" leads to the report/invoice builder directly or after "Start".
+          // Re-reading user request: "Si je clique sur dépanner il faut que j'accéde a une fenetre..."
+          // This refers to the button inside the dialog we just created.
+          handleNotifyClient();
       } else {
           handleNotifyClient();
       }
@@ -71,13 +93,36 @@ export default function InterventionDetails() {
       setCurrentCrmType(type);
       setShowTypeSelection(false);
       
-      toast({
-          title: "Type d'intervention défini",
-          description: `Mode ${type === 'travaux' ? 'Dépannage' : 'Relevé Technique'} activé.`,
-      });
-      
-      // Simulate slight delay before notifying client like normal flow
-      setTimeout(handleNotifyClient, 500);
+      if (type === 'travaux') {
+          setShowDepannageReport(true);
+      } else {
+        toast({
+            title: "Type d'intervention défini",
+            description: `Mode Relevé Technique activé.`,
+        });
+        setTimeout(handleNotifyClient, 500);
+      }
+  };
+
+  const addArticle = (article: any) => {
+      setInvoiceItems([...invoiceItems, { 
+          id: article.id, 
+          name: article.name, 
+          price: article.price, 
+          quantity: 1, 
+          type: "article" 
+      }]);
+      setIsAddingArticle(false);
+  };
+  
+  const removeInvoiceItem = (index: number) => {
+      const newItems = [...invoiceItems];
+      newItems.splice(index, 1);
+      setInvoiceItems(newItems);
+  };
+
+  const calculateTotal = () => {
+      return invoiceItems.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2);
   };
 
   const submitCantDo = () => {
@@ -101,6 +146,121 @@ export default function InterventionDetails() {
   return (
     <Layout>
       {/* Custom Header for Detail View */}
+      {/* Depannage / Invoice Report Drawer/Dialog */}
+      <Drawer open={showDepannageReport} onOpenChange={setShowDepannageReport}>
+        <DrawerContent className="h-[90vh]">
+            <div className="mx-auto w-full max-w-lg h-full flex flex-col">
+                <DrawerHeader>
+                    <DrawerTitle className="flex items-center gap-2">
+                        <Wrench className="h-5 w-5 text-blue-600" />
+                        Rapport de Dépannage
+                    </DrawerTitle>
+                </DrawerHeader>
+                
+                <ScrollArea className="flex-1 px-4">
+                    <div className="space-y-6 pb-6">
+                        
+                        {/* Diagnostic */}
+                        <div className="space-y-2">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <Info className="h-4 w-4" /> Diagnostic
+                            </Label>
+                            <Textarea 
+                                placeholder="Décrivez le problème constaté..." 
+                                value={diagnostic}
+                                onChange={(e) => setDiagnostic(e.target.value)}
+                                className="min-h-[80px]"
+                            />
+                        </div>
+
+                        {/* Travaux Réalisés */}
+                        <div className="space-y-2">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <CheckSquare className="h-4 w-4" /> Travaux Réalisés
+                            </Label>
+                            <Textarea 
+                                placeholder="Détaillez les actions effectuées..." 
+                                value={workDone}
+                                onChange={(e) => setWorkDone(e.target.value)}
+                                className="min-h-[80px]"
+                            />
+                        </div>
+
+                        <Separator />
+
+                        {/* Facturation / Panier */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Label className="font-semibold flex items-center gap-2 text-lg">
+                                    <Receipt className="h-5 w-5" /> Facturation
+                                </Label>
+                                <span className="font-bold text-lg">{calculateTotal()} €</span>
+                            </div>
+
+                            <div className="space-y-2">
+                                {invoiceItems.map((item, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-muted/40 rounded-lg border">
+                                        <div className="flex-1">
+                                            <p className="font-medium text-sm">{item.name}</p>
+                                            <p className="text-xs text-muted-foreground">Qté: {item.quantity} x {item.price}€</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-semibold text-sm">{(item.price * item.quantity).toFixed(2)}€</span>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600" onClick={() => removeInvoiceItem(index)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <Popover open={isAddingArticle} onOpenChange={setIsAddingArticle}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" className="w-full border-dashed">
+                                        <Plus className="mr-2 h-4 w-4" /> Ajouter un article
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="p-0" align="start">
+                                    <Command>
+                                        <CommandInput placeholder="Rechercher un article..." />
+                                        <CommandList>
+                                            <CommandEmpty>Aucun article trouvé.</CommandEmpty>
+                                            <CommandGroup heading="Base Article">
+                                                {MOCK_ARTICLES.map((article) => (
+                                                    <CommandItem
+                                                        key={article.id}
+                                                        onSelect={() => addArticle(article)}
+                                                        className="flex justify-between"
+                                                    >
+                                                        <span>{article.name}</span>
+                                                        <span className="text-muted-foreground ml-2">{article.price}€</span>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                    </div>
+                </ScrollArea>
+
+                <DrawerFooter className="border-t pt-4">
+                    <Button onClick={() => {
+                        setShowDepannageReport(false);
+                        toast({ title: "Rapport enregistré", description: "La facturette a été générée." });
+                        handleNotifyClient();
+                    }} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                        Valider et Terminer
+                    </Button>
+                    <DrawerClose asChild>
+                        <Button variant="outline">Annuler</Button>
+                    </DrawerClose>
+                </DrawerFooter>
+            </div>
+        </DrawerContent>
+      </Drawer>
+
       <Dialog open={showTypeSelection} onOpenChange={setShowTypeSelection}>
         <DialogContent className="sm:max-w-md">
             <div className="flex flex-col items-center gap-4 py-4 text-center">

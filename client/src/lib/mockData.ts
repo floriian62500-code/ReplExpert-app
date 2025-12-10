@@ -279,3 +279,20 @@ export const TODOS = [
   { id: 1, text: "Valider heures du 08/12", urgent: false },
   { id: 2, text: "Signer avenant contrat", urgent: true },
 ];
+
+export interface Article {
+  id: string;
+  name: string;
+  price: number;
+  unit: string;
+}
+
+export const MOCK_ARTICLES: Article[] = [
+  { id: "art-1", name: "Joint fibre 15/21 (sachet de 10)", price: 4.50, unit: "pce" },
+  { id: "art-2", name: "Siphon PVC d40", price: 12.00, unit: "pce" },
+  { id: "art-3", name: "Robinet arrêt 15/21", price: 18.50, unit: "pce" },
+  { id: "art-4", name: "Flexible sanitaire 30cm", price: 8.90, unit: "pce" },
+  { id: "art-5", name: "Colle PVC tube", price: 6.20, unit: "pce" },
+  { id: "art-6", name: "Téflon rouleau", price: 2.50, unit: "pce" },
+  { id: "art-7", name: "Mécanisme WC complet", price: 45.00, unit: "pce" },
+];
