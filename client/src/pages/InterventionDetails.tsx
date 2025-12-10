@@ -1,5 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench, Plus, Trash2, Receipt, PenLine, Minus, Ruler } from "lucide-react";
 import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MATERIALS_LABELS, MOCK_ARTICLES } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ import stockFaucetNew from "@assets/stock_images/new_kitchen_sink_fau_fbbe7b23.j
 
 export default function InterventionDetails() {
   const [, params] = useRoute("/intervention/:id");
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const intervention = MOCK_INTERVENTIONS.find(i => i.id === params?.id);
   const [cancelReason, setCancelReason] = useState("client_absent");
@@ -398,9 +399,13 @@ export default function InterventionDetails() {
                 <DrawerFooter className="border-t pt-4">
                     <Button onClick={() => {
                         setShowRDFReport(false);
-                        toast({ title: "Relevé enregistré", description: "Les informations ont été transmises au bureau des devis." });
+                        toast({ 
+                            title: "Relevé enregistré", 
+                            description: "Une nouvelle intervention a été créée pour la suite des travaux." 
+                        });
+                        setTimeout(() => setLocation("/"), 1500);
                     }} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                        Transmettre au Bureau
+                        Transmettre et Créer Suite
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Annuler</Button>
@@ -429,7 +434,11 @@ export default function InterventionDetails() {
                         onClick={() => {
                             setShowFinishDialog(false);
                             // Report already closed
-                            toast({ title: "Dossier clôturé", description: "Intervention terminée sans suite." });
+                            toast({ 
+                                title: "Dossier clôturé", 
+                                description: "L'intervention est passée au statut 'Terminé'." 
+                            });
+                            setTimeout(() => setLocation("/"), 1000);
                         }}
                     >
                         <Ban className="h-6 w-6 text-gray-500" />
