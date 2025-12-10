@@ -53,32 +53,25 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
                 })}
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground line-clamp-1">{intervention.clientName}</p>
+              <p className="text-base font-bold text-foreground line-clamp-1">{intervention.clientName}</p>
               
-              {intervention.technicians && intervention.technicians.length > 0 && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground my-0.5">
-                    <Users className="h-3 w-3" />
-                    <span>{intervention.technicians.join(", ")}</span>
-                </div>
-              )}
-
               <div className="flex gap-2 mt-1 flex-wrap items-center">
                  {intervention.types.map(type => (
-                     <Badge key={type} variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border bg-white", TRADE_CONFIG[type]?.color, "border-current opacity-80")}>
+                     <Badge key={type} variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border bg-white/80 backdrop-blur-sm", TRADE_CONFIG[type]?.color, "border-current")}>
                         {TRADE_CONFIG[type]?.label}
                      </Badge>
                  ))}
-                 <Badge variant="outline" className={cn("text-xs py-0.5 px-2 h-6 font-bold uppercase tracking-wider border-2 shadow-sm", CRM_TYPE_COLORS[intervention.crmType])}>
+                 <Badge variant="outline" className={cn("text-[10px] py-0 h-5 font-bold uppercase tracking-wider border-0 shadow-sm", CRM_TYPE_COLORS[intervention.crmType])}>
                     {CRM_TYPE_LABELS[intervention.crmType]}
                  </Badge>
               </div>
             </div>
           </div>
-          <Badge variant="outline" className={cn(
-            "uppercase text-[10px]",
-            intervention.status === "todo" && "bg-secondary text-secondary-foreground border-transparent",
-            intervention.status === "in_progress" && "bg-orange-100 text-orange-700 border-orange-200",
-            intervention.status === "done" && "bg-green-100 text-green-700 border-green-200"
+          <Badge className={cn(
+            "uppercase text-[10px] px-3 py-1 rounded-full border-0 font-bold",
+            intervention.status === "todo" && "bg-orange-500 text-white hover:bg-orange-600",
+            intervention.status === "in_progress" && "bg-blue-500 text-white hover:bg-blue-600",
+            intervention.status === "done" && "bg-green-500 text-white hover:bg-green-600"
           )}>
             {intervention.status === "todo" ? "À faire" : intervention.status === "in_progress" ? "En cours" : "Réalisé"}
           </Badge>
@@ -121,33 +114,30 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="bg-muted/30 p-2 px-4 flex justify-between items-center border-t border-border gap-2">
-         <Button variant="outline" size="sm" className="h-8 text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 text-xs px-2" onClick={handleNotifyClient}>
-            <BellRing className="h-3 w-3 mr-1.5" />
+      <CardFooter className="bg-white/50 p-3 px-4 flex justify-between items-center border-t border-border/50 gap-2">
+         <Button variant="outline" size="sm" className="h-9 text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 text-xs px-3 bg-white" onClick={handleNotifyClient}>
+            <BellRing className="h-4 w-4 mr-2" />
             Prévenir client
          </Button>
          
          <div className="flex gap-2">
             <ChatSheet context={`Intervention #${intervention.id.split('-')[1]}`} trigger={
-                <Button size="sm" variant="outline" className={cn(
-                    "gap-2 relative",
+                <Button size="icon" variant="outline" className={cn(
+                    "h-9 w-9 relative bg-white border-blue-200 text-blue-700 hover:bg-blue-50",
                     intervention.id === "int-101" && "border-blue-300 bg-blue-50 text-blue-700"
                 )}>
                     <Building2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Contacter bureau</span>
                     {intervention.id === "int-101" && (
                         <>
-                            <span className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 rounded-full animate-ping opacity-75" />
-                            <span className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 rounded-full border-2 border-white text-[10px] text-white flex items-center justify-center font-bold z-10">
-                                2
-                            </span>
+                            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-ping opacity-75" />
+                            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white z-10" />
                         </>
                     )}
                 </Button>
             } />
             
             <Link href={`/intervention/${intervention.id}`}>
-            <Button size="sm" className="gap-2 text-xs h-8">
+            <Button size="sm" className="gap-2 text-xs h-9 px-4 font-bold bg-blue-800 hover:bg-blue-900 shadow-sm">
                {intervention.status === "todo" ? (
                    <>
                     <Play className="h-3 w-3 fill-current" />
