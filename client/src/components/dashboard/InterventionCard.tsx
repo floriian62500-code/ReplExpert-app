@@ -11,30 +11,40 @@ interface InterventionCardProps {
 }
 
 export function InterventionCard({ intervention }: InterventionCardProps) {
-  const tradeType = intervention.types[0];
-  const config = TRADE_CONFIG[tradeType] || TRADE_CONFIG["plomberie"]; // Fallback
+  const primaryType = intervention.types[0];
+  const primaryConfig = TRADE_CONFIG[primaryType] || TRADE_CONFIG["plomberie"];
 
   return (
     <Card className={cn(
       "border-2 shadow-sm hover:shadow-md transition-shadow",
-      config.color.replace("text-", "border-")
+      primaryConfig.color.replace("text-", "border-")
     )}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center space-x-3">
-            <div className="h-12 w-12 rounded-full overflow-hidden shadow-sm shrink-0">
-              <img 
-                src={config.icon} 
-                alt={config.label} 
-                className="h-full w-full object-cover"
-              />
+            <div className="flex -space-x-4">
+                {intervention.types.map((type, index) => {
+                    const conf = TRADE_CONFIG[type];
+                    if (!conf) return null;
+                    return (
+                        <div key={type} className="h-12 w-12 rounded-full overflow-hidden shadow-sm shrink-0 border-2 border-background relative z-[1]">
+                            <img 
+                                src={conf.icon} 
+                                alt={conf.label} 
+                                className="h-full w-full object-cover"
+                            />
+                        </div>
+                    );
+                })}
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground line-clamp-1">{intervention.clientName}</p>
               <div className="flex gap-2 mt-1 flex-wrap">
-                 <Badge variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border bg-white", config.color, "border-current opacity-80")}>
-                   {config.label}
-                 </Badge>
+                 {intervention.types.map(type => (
+                     <Badge key={type} variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border bg-white", TRADE_CONFIG[type]?.color, "border-current opacity-80")}>
+                        {TRADE_CONFIG[type]?.label}
+                     </Badge>
+                 ))}
                  <Badge variant="outline" className={cn("text-[10px] py-0 h-5 font-normal border", CRM_TYPE_COLORS[intervention.crmType])}>
                     {CRM_TYPE_LABELS[intervention.crmType]}
                  </Badge>
