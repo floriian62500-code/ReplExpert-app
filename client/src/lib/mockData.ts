@@ -25,6 +25,7 @@ export interface Intervention {
   types: string[]; // e.g., ["plomberie", "vitrerie"]
   status: InterventionStatus;
   description: string;
+  reportStatus?: "pending" | "submitted"; // New field for report status
 }
 
 export interface Technician {
@@ -36,6 +37,13 @@ export interface Technician {
   status: "active" | "break" | "off_work";
 }
 
+export interface HRData {
+  weeklyHours: number;
+  overtime: number;
+  documentsToSign: number;
+  pendingLeaveRequests: number;
+}
+
 export const MOCK_TECHNICIAN: Technician = {
   id: "tech-001",
   firstName: "Thomas",
@@ -43,6 +51,13 @@ export const MOCK_TECHNICIAN: Technician = {
   monthlyRevenue: 8500,
   monthlyGoal: 12000,
   status: "off_work"
+};
+
+export const MOCK_HR: HRData = {
+  weeklyHours: 32,
+  overtime: 2.5,
+  documentsToSign: 2,
+  pendingLeaveRequests: 1
 };
 
 export const MOCK_INTERVENTIONS: Intervention[] = [
@@ -56,7 +71,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date().toISOString().split('T')[0], // Today
     types: ["plomberie"],
     status: "todo",
-    description: "Fuite sous évier cuisine + remplacement joint."
+    description: "Fuite sous évier cuisine + remplacement joint.",
+    reportStatus: "pending"
   },
   {
     id: "int-102",
@@ -68,7 +84,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date().toISOString().split('T')[0], // Today
     types: ["serrurerie", "menuiserie"],
     status: "todo",
-    description: "Porte bloquée locataire + réglage fenêtre salon."
+    description: "Porte bloquée locataire + réglage fenêtre salon.",
+    reportStatus: "pending"
   },
   {
     id: "int-103",
@@ -80,7 +97,8 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date().toISOString().split('T')[0], // Today
     types: ["vitrerie"],
     status: "todo",
-    description: "Remplacement double vitrage cassé suite effraction."
+    description: "Remplacement double vitrage cassé suite effraction.",
+    reportStatus: "pending"
   },
   {
     id: "int-104",
@@ -92,7 +110,48 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
     types: ["electricite"],
     status: "todo",
-    description: "Panne éclairage parties communes hall B."
+    description: "Panne éclairage parties communes hall B.",
+    reportStatus: "pending"
+  },
+  // History items
+  {
+    id: "int-098",
+    clientName: "M. Dupuis",
+    clientType: "particulier",
+    address: "5 Rue de la République",
+    city: "Lyon 2ème",
+    timeSlot: "10:00 - 11:30",
+    date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
+    types: ["plomberie"],
+    status: "done",
+    description: "Remplacement robinet cuisine.",
+    reportStatus: "pending" // Needs finalizing
+  },
+  {
+    id: "int-097",
+    clientName: "Boulangerie Paul",
+    clientType: "pro",
+    address: "15 Rue Victor Hugo",
+    city: "Lyon 2ème",
+    timeSlot: "14:00 - 15:30",
+    date: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
+    types: ["electricite"],
+    status: "done",
+    description: "Installation nouvelles prises fournil.",
+    reportStatus: "submitted"
+  },
+  {
+    id: "int-096",
+    clientName: "Mme. Lefebvre",
+    clientType: "particulier",
+    address: "33 Cours Vitton",
+    city: "Lyon 6ème",
+    timeSlot: "09:00 - 10:00",
+    date: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
+    types: ["serrurerie"],
+    status: "done",
+    description: "Ouverture de porte claquée.",
+    reportStatus: "submitted"
   }
 ];
 
@@ -123,7 +182,6 @@ export const TRADE_LABELS: Record<string, string> = {
 };
 
 export const TODOS = [
-  { id: 1, text: "Compléter relevé technique #int-098", urgent: true },
-  { id: 2, text: "Valider heures du 08/12", urgent: false },
-  { id: 3, text: "Signer avenant contrat", urgent: false },
+  { id: 1, text: "Valider heures du 08/12", urgent: false },
+  { id: 2, text: "Signer avenant contrat", urgent: true },
 ];

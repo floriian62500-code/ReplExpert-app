@@ -5,7 +5,7 @@ import { InterventionCard } from "@/components/dashboard/InterventionCard";
 import { ActionList } from "@/components/dashboard/ActionList";
 import { MOCK_TECHNICIAN, MOCK_INTERVENTIONS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, History, Users } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Dashboard() {
@@ -20,6 +20,22 @@ export default function Dashboard() {
         {/* CA Block */}
         <section>
           <StatCard technician={MOCK_TECHNICIAN} />
+        </section>
+
+        {/* Quick Links Grid */}
+        <section className="grid grid-cols-2 gap-3">
+            <Link href="/history">
+                <Button variant="outline" className="w-full h-12 justify-start gap-2 bg-white/50 border-dashed">
+                    <History className="h-4 w-4 text-primary" />
+                    Historique
+                </Button>
+            </Link>
+            <Link href="/hr">
+                <Button variant="outline" className="w-full h-12 justify-start gap-2 bg-white/50 border-dashed">
+                    <Users className="h-4 w-4 text-primary" />
+                    Espace RH
+                </Button>
+            </Link>
         </section>
 
         {/* Interventions of the day */}

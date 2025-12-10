@@ -8,15 +8,19 @@ import Dashboard from "@/pages/Dashboard";
 import Planning from "@/pages/Planning";
 import InterventionDetails from "@/pages/InterventionDetails";
 import Profile from "@/pages/Profile";
+import History from "@/pages/History";
+import HRModule from "@/pages/HRModule";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/planning" component={Planning} />
-      <Route path="/interventions" component={Planning} /> {/* Reuse planning for list for now */}
+      <Route path="/interventions" component={Planning} />
       <Route path="/intervention/:id" component={InterventionDetails} />
       <Route path="/profile" component={Profile} />
+      <Route path="/history" component={History} />
+      <Route path="/hr" component={HRModule} />
       <Route component={NotFound} />
     </Switch>
   );
