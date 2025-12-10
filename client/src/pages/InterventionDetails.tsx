@@ -59,7 +59,10 @@ export default function InterventionDetails() {
         <div className="px-4 -mt-6 relative z-10 space-y-6">
             
             {/* Main Info Card */}
-            <Card className="shadow-lg border-none overflow-hidden">
+            <Card className={cn(
+                "shadow-lg border-2 overflow-hidden",
+                config.color.replace("text-", "border-")
+            )}>
                 <div className={cn("h-2 w-full", config.bgColor.replace("bg-", "bg-"))} style={{backgroundColor: "currentColor"}} />
                 <CardContent className="p-5 space-y-4 pt-6">
                     <div className="flex justify-between items-start">

@@ -16,8 +16,8 @@ export function InterventionCard({ intervention }: InterventionCardProps) {
 
   return (
     <Card className={cn(
-      "border-l-4 shadow-sm hover:shadow-md transition-shadow",
-      config.color.replace("text-", "border-l-")
+      "border-2 shadow-sm hover:shadow-md transition-shadow",
+      config.color.replace("text-", "border-")
     )}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
