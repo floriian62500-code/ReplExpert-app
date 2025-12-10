@@ -94,7 +94,8 @@ export default function InterventionDetails() {
   
   const handleStartIntervention = () => {
       setStatus("in_progress");
-      handleNotifyClient();
+      // SMS notification removed as requested
+      // handleNotifyClient();
   };
 
   const handleFinishIntervention = () => {
