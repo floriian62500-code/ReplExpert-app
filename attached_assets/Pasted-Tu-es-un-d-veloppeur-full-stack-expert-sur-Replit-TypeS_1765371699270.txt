@@ -1,0 +1,163 @@
+Tu es un développeur full‑stack expert sur Replit (TypeScript / React / Node) et en conception d’applications mobiles pour techniciens de dépannage.
+
+🎯 Objectif :  
+Créer le SQUELETTE d’une application web **mobile‑first** pour les techniciens du réseau **HELPCONFORT** :
+
+- Utilisation sur **téléphone et tablette**
+- Front : **React + TypeScript + Tailwind CSS**
+- Back : **API Node/Express (ou équivalent) avec données mockées en mémoire ou JSON**
+- Architecture propre, composants réutilisables, facile à faire évoluer
+
+L’app doit être organisée autour d’un **tronc commun stable** + **modules métiers paramétrables**.
+
+---
+
+## 1️⃣ Contexte métier
+
+HELPCONFORT = réseau national de dépannage qui intervient en :
+
+- Chauffage  
+- Plomberie  
+- Vitrerie  
+- Menuiserie  
+- Électricité  
+- Plâtrerie  
+- Peinture  
+- Isolation  
+- Volet roulant  
+- Serrurerie  
+
+Les techniciens doivent, depuis leur téléphone :
+
+- Voir leur **tableau de bord** (écran principal)
+- Voir leur **planning du jour + futur**
+- Démarrer / terminer leurs **interventions**
+- Faire des **relevés techniques** (avec arbres de questions par métier)
+- Pointer leurs heures (pointeuse)
+- Gérer **congés / absences**
+- Échanger avec le bureau (messagerie liée aux interventions)
+- Suivre leur **chiffre d’affaires** et objectifs
+- Travailler avec une app **connectable à n’importe quel CRM** via un backend générique
+
+---
+
+## 2️⃣ Stack technique exigée
+
+- **Frontend**
+  - React
+  - TypeScript
+  - Tailwind CSS
+  - Routing (React Router ou équivalent)
+
+- **Backend**
+  - Node.js
+  - Express (ou équivalent)
+  - Données mock en mémoire (JSON) pour :
+    - techniciens
+    - agences
+    - interventions
+    - relevés techniques
+    - arbres métiers
+    - pointage
+    - messages
+
+- Organisation en monorepo simple ou `client` + `server` dans Replit.
+
+---
+
+## 3️⃣ Écrans à implémenter (version 1)
+
+### A. 🏠 Tableau de bord technicien (ÉCRAN PRINCIPAL)
+
+C’est la **vue d’accueil** après connexion.
+
+Contenu :
+
+1. **En‑tête**
+   - “Bonjour, [Prénom technicien]”
+   - Bouton **Pointeuse** contextuel :
+     - “Démarrer ma journée”
+     - ou “Mettre en pause”
+     - ou “Fin de journée”
+
+2. **Bloc CA**
+   - CA réalisé du mois (chiffre)
+   - Objectif du mois
+   - Jauge simple (ex : barre remplie / label “En avance” ou “En retard”)
+   - Lien “Voir détail CA”
+
+3. **Bloc “Mes interventions du jour”**
+   - Liste de cartes :
+     - Heure
+     - Client
+     - Adresse courte
+     - Icône métier (plomberie, vitrerie, etc.)
+     - Statut : À faire / En cours / Terminé
+   - Actions rapides sur chaque carte :
+     - ▶️ Démarrer intervention
+     - 📋 Relevé technique
+     - 💬 Messages bureau
+   - Bouton “Voir mon planning complet”
+
+4. **Bloc “À faire pour moi”**
+   - Éléments type :
+     - “Compléter X relevés techniques”
+     - “Valider heure de fin de journée du [date]”
+     - “Demande de congé en attente de validation”
+   - Bouton “Demander un congé / repos”
+
+5. **Navigation en bas d’écran**
+   - 🏠 Tableau de bord (actif)
+   - 📅 Planning
+   - 🧰 Interventions
+   - 👤 Mon compte
+
+---
+
+### B. 📅 Planning
+
+- Vue planning avec :
+  - Mode jour / semaine (simple)
+  - Liste des interventions pour la date choisie
+- Règles :
+  - Le technicien peut **toujours** voir ses interventions à venir, même avant leur date/heure.
+  - La **restriction de pointage** ne doit JAMAIS bloquer l’accès au planning.
+
+---
+
+### C. 🧰 Détail d’une intervention
+
+Carte détaillée :
+
+- Infos client (nom, type : particulier/pro/bailleur)
+- Adresse + lien “ouvrir dans Maps” (factice)
+- Métiers concernés (ex : plomberie + vitrerie)
+- Créneaux horaires
+- Statut intervention
+- Boutons :
+  - ▶️ Démarrer / Mettre en pause / Terminer l’intervention
+  - 📋 Accéder au relevé technique
+  - 📷 Gérer photos / croquis
+  - 💬 Ouvrir messagerie (chat avec le bureau)
+  - 📄 Voir / générer le récap (mock devis / facture)
+
+---
+
+### D. ⏱️ Module Pointeuse
+
+Règles métier à implémenter :
+
+1. **Paramétrage par agence**
+
+Modèle de config agence :
+
+```ts
+type AgenceConfig = {
+  id: string;
+  nom: string;
+  pointage: {
+    heure_debut_pointage: string;               // ex "08:00"
+    bloquer_pointage_avant_heure: boolean;      // true = on ne peut pas pointer avant
+    bloquer_demarrage_intervention_avant_heure: boolean; // optionnel
+  };
+};
