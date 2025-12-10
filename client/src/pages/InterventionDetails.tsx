@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { useRoute } from "wouter";
-import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench, Plus, Trash2, Receipt } from "lucide-react";
+import { MapPin, Clock, Phone, MessageSquare, ArrowLeft, Camera, FileText, Play, Pause, CheckSquare, Navigation, BellRing, Package, Info, ImageIcon, FolderOpen, Ban, Upload, FileCheck, ShoppingCart, Eye, Wrench, Plus, Trash2, Receipt, PenLine, Minus } from "lucide-react";
 import { MOCK_INTERVENTIONS, TRADE_CONFIG, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MATERIALS_LABELS, MOCK_ARTICLES } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -66,6 +66,8 @@ export default function InterventionDetails() {
       { id: "supplies", name: "Petites fournitures", price: 15, quantity: 1, type: "service" }
   ]);
   const [isAddingArticle, setIsAddingArticle] = useState(false);
+  const [interventionOutcome, setInterventionOutcome] = useState("finished"); // "finished" | "quote_needed"
+  const [signature, setSignature] = useState(false); // Mock signature state
 
   const handleNotifyClient = () => {
     toast({
@@ -121,6 +123,13 @@ export default function InterventionDetails() {
   const removeInvoiceItem = (index: number) => {
       const newItems = [...invoiceItems];
       newItems.splice(index, 1);
+      setInvoiceItems(newItems);
+  };
+
+  const updateQuantity = (index: number, delta: number) => {
+      const newItems = [...invoiceItems];
+      const newQuantity = Math.max(1, newItems[index].quantity + delta);
+      newItems[index] = { ...newItems[index], quantity: newQuantity };
       setInvoiceItems(newItems);
   };
 
@@ -205,7 +214,26 @@ export default function InterventionDetails() {
                                     <div key={index} className="flex items-center justify-between p-3 bg-muted/40 rounded-lg border">
                                         <div className="flex-1">
                                             <p className="font-medium text-sm">{item.name}</p>
-                                            <p className="text-xs text-muted-foreground">Qté: {item.quantity} x {item.price}€</p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="icon" 
+                                                    className="h-6 w-6" 
+                                                    onClick={() => updateQuantity(index, -1)}
+                                                >
+                                                    <Minus className="h-3 w-3" />
+                                                </Button>
+                                                <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="icon" 
+                                                    className="h-6 w-6" 
+                                                    onClick={() => updateQuantity(index, 1)}
+                                                >
+                                                    <Plus className="h-3 w-3" />
+                                                </Button>
+                                                <span className="text-xs text-muted-foreground ml-2">x {item.price}€</span>
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="font-semibold text-sm">{(item.price * item.quantity).toFixed(2)}€</span>
@@ -245,16 +273,84 @@ export default function InterventionDetails() {
                                 </PopoverContent>
                             </Popover>
                         </div>
+
+                        <Separator />
+
+                        {/* Clôture Intervention */}
+                        <div className="space-y-4">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <CheckSquare className="h-4 w-4" /> Résultat de l'intervention
+                            </Label>
+                            <RadioGroup value={interventionOutcome} onValueChange={setInterventionOutcome} className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <RadioGroupItem value="finished" id="outcome-finished" className="peer sr-only" />
+                                    <Label
+                                        htmlFor="outcome-finished"
+                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-green-500 peer-data-[state=checked]:bg-green-50 [&:has([data-state=checked])]:border-green-500"
+                                    >
+                                        <CheckSquare className="mb-3 h-6 w-6 text-green-600" />
+                                        Terminé
+                                    </Label>
+                                </div>
+                                <div>
+                                    <RadioGroupItem value="quote_needed" id="outcome-quote" className="peer sr-only" />
+                                    <Label
+                                        htmlFor="outcome-quote"
+                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-500 peer-data-[state=checked]:bg-orange-50 [&:has([data-state=checked])]:border-orange-500"
+                                    >
+                                        <FileText className="mb-3 h-6 w-6 text-orange-600" />
+                                        Devis à faire
+                                    </Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+
+                        {/* Signature Client */}
+                        <div className="space-y-2">
+                            <Label className="font-semibold flex items-center gap-2">
+                                <PenLine className="h-4 w-4" /> Signature du Client
+                            </Label>
+                            <div 
+                                className={cn(
+                                    "border-2 border-dashed rounded-lg h-32 flex items-center justify-center cursor-pointer transition-colors",
+                                    signature ? "bg-blue-50 border-blue-200" : "bg-muted/30 hover:bg-muted/50"
+                                )}
+                                onClick={() => setSignature(!signature)}
+                            >
+                                {signature ? (
+                                    <div className="text-center">
+                                        <p className="font-handwriting text-2xl text-blue-800 rotate-[-5deg]">Lu et Approuvé</p>
+                                        <p className="text-xs text-blue-600 mt-2">Signé numériquement</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">Cliquer pour signer</p>
+                                )}
+                            </div>
+                        </div>
+
                     </div>
                 </ScrollArea>
 
                 <DrawerFooter className="border-t pt-4">
-                    <Button onClick={() => {
-                        setShowDepannageReport(false);
-                        toast({ title: "Rapport enregistré", description: "La facturette a été générée." });
-                        handleNotifyClient();
-                    }} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                        Valider et Terminer
+                    <Button 
+                        onClick={() => {
+                            if (!signature) {
+                                toast({ title: "Signature manquante", description: "Veuillez faire signer le client.", variant: "destructive" });
+                                return;
+                            }
+                            setShowDepannageReport(false);
+                            toast({ 
+                                title: interventionOutcome === 'finished' ? "Intervention terminée" : "Demande de devis enregistrée", 
+                                description: interventionOutcome === 'finished' ? "La facturette a été envoyée au client." : "Les informations ont été transmises au bureau." 
+                            });
+                            // handleNotifyClient(); // Maybe separate notification for finish
+                        }} 
+                        className={cn(
+                            "w-full text-white",
+                            interventionOutcome === 'finished' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"
+                        )}
+                    >
+                        {interventionOutcome === 'finished' ? "Valider, Facturer et Terminer" : "Valider et Transmettre pour Devis"}
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Annuler</Button>
