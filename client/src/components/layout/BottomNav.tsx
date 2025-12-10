@@ -7,8 +7,6 @@ export function BottomNav() {
 
   const navItems = [
     { icon: Home, label: "Accueil", path: "/" },
-    { icon: Calendar, label: "Planning", path: "/planning" },
-    { icon: Briefcase, label: "Interventions", path: "/interventions" },
     { icon: User, label: "Compte", path: "/profile" },
   ];
 
