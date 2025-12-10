@@ -101,7 +101,7 @@ export const MOCK_INTERVENTIONS: Intervention[] = [
     timeSlot: "09:00 - 10:30",
     date: new Date().toISOString().split('T')[0], // Today
     types: ["plomberie"],
-    status: "done",
+    status: "todo",
     description: "Fuite constatée sous l'évier de la cuisine. Le client signale un joint défectueux.",
     reportStatus: "pending",
     crmType: "travaux",
