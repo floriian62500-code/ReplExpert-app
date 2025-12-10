@@ -291,8 +291,14 @@ export default function InterventionDetails() {
                         {/* Signature Client */}
                         <div className="space-y-2">
                             <Label className="font-semibold flex items-center gap-2">
-                                <PenLine className="h-4 w-4" /> Signature du Client
+                                <PenLine className="h-4 w-4" /> 
+                                {currentCrmType === 'travaux' ? "Signature PV selon devis" : "Signature du Client"}
                             </Label>
+                            {currentCrmType === 'travaux' && (
+                                <p className="text-xs text-muted-foreground -mt-1 mb-2">
+                                    Veuillez faire signer le PV de réception confirmant la conformité avec le devis initial.
+                                </p>
+                            )}
                             <div 
                                 className={cn(
                                     "border-2 border-dashed rounded-lg h-32 flex items-center justify-center cursor-pointer transition-colors",
@@ -302,7 +308,9 @@ export default function InterventionDetails() {
                             >
                                 {signature ? (
                                     <div className="text-center">
-                                        <p className="font-handwriting text-2xl text-blue-800 rotate-[-5deg]">Lu et Approuvé</p>
+                                        <p className="font-handwriting text-2xl text-blue-800 rotate-[-5deg]">
+                                            {currentCrmType === 'travaux' ? "PV Signé / Conforme" : "Lu et Approuvé"}
+                                        </p>
                                         <p className="text-xs text-blue-600 mt-2">Signé numériquement</p>
                                     </div>
                                 ) : (
