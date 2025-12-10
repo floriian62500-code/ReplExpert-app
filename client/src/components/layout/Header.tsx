@@ -1,8 +1,7 @@
-import { Bell, MessageSquare } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Technician } from "@/lib/mockData";
-import { ChatSheet } from "@/components/chat/ChatSheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,12 +31,6 @@ export function Header({ technician }: HeaderProps) {
         </div>
 
         <div className="flex items-center space-x-1">
-          <ChatSheet trigger={
-             <Button variant="ghost" size="icon" className="text-muted-foreground">
-               <MessageSquare className="h-5 w-5" />
-             </Button>
-          } />
-          
           <Button variant="ghost" size="icon" className="relative text-muted-foreground">
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-secondary rounded-full border border-background" />
