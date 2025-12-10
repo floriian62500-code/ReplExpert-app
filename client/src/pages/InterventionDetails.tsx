@@ -38,6 +38,7 @@ export default function InterventionDetails() {
   const intervention = MOCK_INTERVENTIONS.find(i => i.id === params?.id);
   const [cancelReason, setCancelReason] = useState("client_absent");
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [status, setStatus] = useState(intervention?.status || "todo");
 
   // Mock state for photos
   const [photosBefore, setPhotosBefore] = useState([
@@ -89,19 +90,17 @@ export default function InterventionDetails() {
   };
   
   const handleStartIntervention = () => {
-      if (currentCrmType === 'a_definir') {
-          setShowTypeSelection(true);
-      } else if (currentCrmType === 'travaux') {
-          // If already Travaux, directly open report? 
-          // Or user wants this when clicking "Dépanner" inside the modal.
-          // Assuming user means: if I select "Depanner" -> opens report window.
-          // If status is "todo", usually "Start" moves to "In Progress".
-          // Let's assume for this prototype flow, "Dépanner" leads to the report/invoice builder directly or after "Start".
-          // Re-reading user request: "Si je clique sur dépanner il faut que j'accéde a une fenetre..."
-          // This refers to the button inside the dialog we just created.
-          handleNotifyClient();
+      setStatus("in_progress");
+      handleNotifyClient();
+  };
+
+  const handleFinishIntervention = () => {
+      if (currentCrmType === 'travaux') {
+          setShowDepannageReport(true);
+      } else if (currentCrmType === 'rdf') {
+          setShowRDFReport(true);
       } else {
-          handleNotifyClient();
+          setShowTypeSelection(true);
       }
   };
 
@@ -1117,15 +1116,70 @@ export default function InterventionDetails() {
       {/* Floating Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
          <div className="flex gap-3">
-            {intervention.status === "in_progress" && (
+            {status === "in_progress" ? (
                 <>
                     <Button variant="outline" className="flex-1 h-12 border-orange-200 text-orange-600 hover:text-orange-700 hover:bg-orange-50">
                         <Pause className="h-5 w-5 mr-2" /> Pause
                     </Button>
-                    <Button className="flex-[2] h-12 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20">
+                    <Button 
+                        className="flex-[2] h-12 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20"
+                        onClick={handleFinishIntervention}
+                    >
                         <CheckSquare className="h-5 w-5 mr-2" /> Terminer
                     </Button>
                 </>
+            ) : status === "todo" && (
+                <div className="flex w-full gap-3">
+                    <Drawer>
+                        <DrawerTrigger asChild>
+                            <Button variant="outline" className="flex-1 h-12 border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm">
+                                <Ban className="h-4 w-4 sm:mr-2 shrink-0" />
+                                <span className="hidden sm:inline">Je ne peux pas</span>
+                                <span className="sm:hidden">Impossible</span>
+                            </Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                            <div className="mx-auto w-full max-w-sm">
+                                <DrawerHeader>
+                                    <DrawerTitle>Pourquoi ne pouvez-vous pas intervenir ?</DrawerTitle>
+                                </DrawerHeader>
+                                <div className="p-4 pb-0">
+                                    <RadioGroup value={cancelReason} onValueChange={setCancelReason} className="gap-3">
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="client_absent" id="r1" />
+                                            <Label htmlFor="r1" className="flex-1 cursor-pointer">Client absent</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="no_time" id="r2" />
+                                            <Label htmlFor="r2" className="flex-1 cursor-pointer">Manque de temps</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="wrong_material" id="r3" />
+                                            <Label htmlFor="r3" className="flex-1 cursor-pointer">Pas le bon matériel</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-3 rounded-lg has-[:checked]:bg-red-50 has-[:checked]:border-red-200">
+                                            <RadioGroupItem value="sav_product" id="r4" />
+                                            <Label htmlFor="r4" className="flex-1 cursor-pointer">SAV produit</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                                <DrawerFooter>
+                                    <DrawerClose asChild>
+                                        <Button onClick={submitCantDo} className="w-full bg-red-600 hover:bg-red-700 text-white">Confirmer</Button>
+                                    </DrawerClose>
+                                    <DrawerClose asChild>
+                                        <Button variant="outline">Annuler</Button>
+                                    </DrawerClose>
+                                </DrawerFooter>
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
+
+                    <Button className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white shadow-md text-xs sm:text-sm" onClick={handleStartIntervention}>
+                        <Play className="h-4 w-4 sm:mr-2 shrink-0 fill-current" />
+                        Commencer
+                    </Button>
+                </div>
             )}
          </div>
       </div>
