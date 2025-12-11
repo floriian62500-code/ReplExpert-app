@@ -369,8 +369,11 @@ export default function AdminDashboard() {
                                 className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-3 ${selectedUniverse === key ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'hover:bg-gray-50'}`}
                                 onClick={() => handleUniverseSelect(key)}
                             >
-                                <div className={`w-3 h-3 rounded-full ${selectedUniverse === key ? 'bg-blue-500' : 'bg-gray-200'}`} />
-                                <span className="font-medium text-sm">{config.label}</span>
+                                <div className="w-10 h-10 bg-white rounded-full p-1.5 border shadow-sm flex items-center justify-center">
+                                    <img src={config.icon} alt={config.label} className="w-full h-full object-contain" />
+                                </div>
+                                <span className="font-medium text-sm flex-1">{config.label}</span>
+                                {selectedUniverse === key && <div className="w-2 h-2 rounded-full bg-blue-500" />}
                             </div>
                         ))}
                     </CardContent>
