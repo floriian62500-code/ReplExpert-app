@@ -10,11 +10,13 @@ import InterventionDetails from "@/pages/InterventionDetails";
 import Profile from "@/pages/Profile";
 import History from "@/pages/History";
 import HRModule from "@/pages/HRModule";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/planning" component={Planning} />
       <Route path="/interventions" component={Planning} />
       <Route path="/intervention/:id" component={InterventionDetails} />

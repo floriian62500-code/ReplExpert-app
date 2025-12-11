@@ -2,8 +2,9 @@ import { Layout } from "@/components/layout/Layout";
 import { Header } from "@/components/layout/Header";
 import { MOCK_TECHNICIAN } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, ShieldCheck } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Link } from "wouter";
 
 export default function Profile() {
   return (
@@ -20,6 +21,12 @@ export default function Profile() {
         </div>
 
         <div className="space-y-2">
+            <Link href="/admin">
+                <Button variant="outline" className="w-full justify-start h-12 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800" size="lg">
+                    <ShieldCheck className="mr-3 h-5 w-5" />
+                    Accès Administrateur
+                </Button>
+            </Link>
             <Button variant="outline" className="w-full justify-start h-12" size="lg">
                 <User className="mr-3 h-5 w-5" />
                 Informations personnelles
