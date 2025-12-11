@@ -531,6 +531,7 @@ export default function AdminDashboard() {
                           <TableHead>Client</TableHead>
                           <TableHead>Type</TableHead>
                           <TableHead>Statut</TableHead>
+                          <TableHead>Rapport</TableHead>
                           <TableHead>Technicien</TableHead>
                           <TableHead className="text-right">Action</TableHead>
                         </TableRow>
@@ -554,6 +555,21 @@ export default function AdminDashboard() {
                               <Badge variant={intervention.status === 'done' ? 'default' : intervention.status === 'in_progress' ? 'secondary' : 'outline'}>
                                 {intervention.status === 'todo' ? 'À faire' : intervention.status === 'in_progress' ? 'En cours' : 'Terminé'}
                               </Badge>
+                            </TableCell>
+                            <TableCell>
+                                {intervention.reportStatus === 'submitted' && (
+                                    <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
+                                        <Check className="mr-1 h-3 w-3" /> Reçu
+                                    </Badge>
+                                )}
+                                {intervention.reportStatus === 'pending' && intervention.status === 'done' && (
+                                    <Badge variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200">
+                                        Manquant
+                                    </Badge>
+                                )}
+                                {intervention.reportStatus === 'pending' && intervention.status !== 'done' && (
+                                    <span className="text-muted-foreground text-xs">-</span>
+                                )}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
