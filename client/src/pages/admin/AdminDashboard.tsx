@@ -11,7 +11,9 @@ import {
   Trash2,
   FileText,
   Hammer,
-  GitFork
+  GitFork,
+  ArrowLeft,
+  Save
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,6 +74,8 @@ export default function AdminDashboard() {
   const [rtFields, setRtFields] = useState<string[]>([]); // To simulate showing "creation part"
 
   // New RT Editor State
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [templateName, setTemplateName] = useState("");
   const [isArboMode, setIsArboMode] = useState(false);
   const [editorFields, setEditorFields] = useState<{id: string, label: string, type: string, parent?: string}[]>([
       { id: '1', label: 'Type de panne', type: 'select', parent: undefined },
@@ -92,12 +96,38 @@ export default function AdminDashboard() {
 
   const handleUniverseSelect = (universe: string) => {
       setSelectedUniverse(universe);
+      setSelectedTemplate(null);
       // Mock fields based on universe to show "What is in this RT"
       if (universe === 'plomberie') setRtFields(["Type de fuite", "Matériau", "Diamètre"]);
       else if (universe === 'serrurerie') setRtFields(["Type de serrure", "Dimensions Cylindre", "Marque"]);
       else if (universe === 'vitrerie') setRtFields(["Type de vitrage", "Clair de jour", "Épaisseur"]);
       else if (universe === 'electricite') setRtFields(["Type de panne", "Installation (Mono/Tri)"]);
       else setRtFields(["Prise de cotes libre", "Photos"]);
+  };
+
+  const handleTemplateClick = (type: 'new' | 'standard' | 'complex') => {
+      setSelectedTemplate(type);
+      if (type === 'new') {
+          setTemplateName("");
+          setIsArboMode(false);
+          setEditorFields([]);
+      } else if (type === 'standard') {
+          setTemplateName("RT Standard");
+          setIsArboMode(false);
+          setEditorFields([
+              { id: '1', label: 'Description', type: 'text', parent: undefined },
+              { id: '2', label: 'Localisation', type: 'select', parent: undefined },
+              { id: '3', label: 'Photos', type: 'photo', parent: undefined }
+          ]);
+      } else if (type === 'complex') {
+          setTemplateName("Diagnostic Complet");
+          setIsArboMode(true);
+          setEditorFields([
+              { id: '1', label: 'Zone', type: 'select', parent: undefined },
+              { id: '2', label: 'Sous-Zone', type: 'select', parent: '1' },
+              { id: '3', label: 'Détail', type: 'text', parent: '2' }
+          ]);
+      }
   };
 
   const handleSaveTech = () => {
@@ -417,121 +447,163 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {selectedUniverse ? (
-                        <div className="space-y-6">
-                            
-                            {/* List of existing RTs for this universe */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Mock existing templates */}
-                                <div className="p-4 border rounded-xl bg-white hover:border-purple-400 cursor-pointer transition-all group relative">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                            <FileText className="h-5 w-5" />
-                                        </div>
-                                        <Badge variant="secondary" className="text-xs">Standard</Badge>
-                                    </div>
-                                    <h3 className="font-semibold text-gray-900">RT Standard</h3>
-                                    <p className="text-xs text-muted-foreground mt-1">Formulaire simple (Liste)</p>
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" className="h-6 w-6"><Edit className="h-3 w-3" /></Button>
-                                    </div>
-                                </div>
+                        selectedTemplate ? (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                                <Button 
+                                    variant="ghost" 
+                                    onClick={() => setSelectedTemplate(null)} 
+                                    className="mb-2 pl-0 hover:pl-2 transition-all text-muted-foreground hover:text-gray-900"
+                                >
+                                    <ArrowLeft className="h-4 w-4 mr-2" />
+                                    Retour aux modèles
+                                </Button>
 
-                                <div className="p-4 border rounded-xl bg-white hover:border-purple-400 cursor-pointer transition-all group relative">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-                                            <GitFork className="h-5 w-5" />
+                                <div className="bg-slate-50 p-6 rounded-xl border space-y-6 shadow-sm">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                {selectedTemplate === 'new' ? 'Nouveau Modèle' : 'Édition du Modèle'}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground">Configuration des champs et de la structure</p>
                                         </div>
-                                        <Badge variant="secondary" className="text-xs">Complexe</Badge>
-                                    </div>
-                                    <h3 className="font-semibold text-gray-900">Diagnostic Complet</h3>
-                                    <p className="text-xs text-muted-foreground mt-1">Mode Arborescence activé</p>
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" className="h-6 w-6"><Edit className="h-3 w-3" /></Button>
-                                    </div>
-                                </div>
-
-                                {/* Add New Button */}
-                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all text-muted-foreground hover:text-purple-600 h-full min-h-[120px]"
-                                     onClick={() => toast({ title: "Nouveau modèle", description: "Ouverture de l'éditeur de formulaire..." })}>
-                                    <Plus className="h-8 w-8" />
-                                    <span className="font-medium text-sm">Créer un nouveau RT</span>
-                                </div>
-                            </div>
-
-                            <div className="border-t pt-6 mt-6">
-                                <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                                    <Edit className="h-4 w-4" /> 
-                                    Éditeur Rapide (Aperçu)
-                                </h4>
-                                <div className="bg-slate-50 p-4 rounded-lg border space-y-4">
-                                    <div className="flex gap-4">
-                                        <div className="flex-1 space-y-2">
-                                            <Label>Nom du Relevé Technique</Label>
-                                            <Input placeholder="Ex: Dépannage Fuite" defaultValue="Nouveau RT" />
-                                        </div>
-                                        <div className="flex items-center space-x-2 pt-8">
+                                        <div className="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-lg border">
                                             <Switch 
                                                 id="arbo-mode" 
                                                 checked={isArboMode}
                                                 onCheckedChange={setIsArboMode}
                                             />
-                                            <Label htmlFor="arbo-mode" className="cursor-pointer">Mode Arborescence</Label>
+                                            <Label htmlFor="arbo-mode" className="cursor-pointer text-sm font-medium">Mode Arborescence</Label>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Structure des données</Label>
-                                            <div className="flex gap-2">
-                                                <Input 
-                                                    placeholder="Libellé..." 
-                                                    value={newFieldLabel}
-                                                    onChange={(e) => setNewFieldLabel(e.target.value)}
-                                                    className="w-32 h-8 text-xs"
-                                                />
-                                                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('text')}>+ Texte</Button>
-                                                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('select')}>+ Choix</Button>
-                                                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('photo')}>+ Photo</Button>
-                                            </div>
+                                        <div className="space-y-2">
+                                            <Label>Nom du Relevé Technique</Label>
+                                            <Input 
+                                                placeholder="Ex: Dépannage Fuite" 
+                                                value={templateName}
+                                                onChange={(e) => setTemplateName(e.target.value)}
+                                                className="bg-white"
+                                            />
                                         </div>
-                                        
-                                        <div className="bg-white border rounded p-3 text-sm min-h-[150px] space-y-2">
-                                            {editorFields.length === 0 ? (
-                                                <div className="text-muted-foreground text-center py-8 border-dashed">
-                                                    Faites glisser des champs ou ajoutez-les...
+
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <Label>Structure des données</Label>
+                                                <div className="flex gap-2">
+                                                    <Input 
+                                                        placeholder="Libellé du champ..." 
+                                                        value={newFieldLabel}
+                                                        onChange={(e) => setNewFieldLabel(e.target.value)}
+                                                        className="w-40 h-8 text-xs bg-white"
+                                                    />
+                                                    <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('text')}>+ Texte</Button>
+                                                    <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('select')}>+ Choix</Button>
+                                                    <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('photo')}>+ Photo</Button>
                                                 </div>
-                                            ) : (
-                                                editorFields.map((field, idx) => (
-                                                    <div key={field.id} className={`p-2 border rounded bg-gray-50 flex items-center gap-2 ${field.parent ? 'ml-6 border-l-4 border-l-purple-200' : ''}`}>
-                                                        <div className="p-1 bg-white rounded border">
-                                                            {field.type === 'text' && <Edit className="h-3 w-3 text-gray-500" />}
-                                                            {field.type === 'select' && <GitFork className="h-3 w-3 text-blue-500" />}
-                                                            {field.type === 'photo' && <FileText className="h-3 w-3 text-purple-500" />}
+                                            </div>
+                                            
+                                            <div className="bg-white border rounded-lg p-4 text-sm min-h-[200px] space-y-2 shadow-inner">
+                                                {editorFields.length === 0 ? (
+                                                    <div className="text-muted-foreground text-center py-12 border-2 border-dashed rounded-lg">
+                                                        <div className="flex flex-col items-center gap-2">
+                                                            <Plus className="h-8 w-8 opacity-20" />
+                                                            <p>Ajoutez des champs pour commencer</p>
                                                         </div>
-                                                        <span className="font-medium flex-1">{field.label}</span>
-                                                        <span className="text-xs text-muted-foreground uppercase px-2 py-0.5 bg-gray-200 rounded">{field.type}</span>
-                                                        {isArboMode && idx < editorFields.length - 1 && (
-                                                            <div className="w-px h-4 bg-gray-300 mx-1" />
-                                                        )}
-                                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-600" onClick={() => {
-                                                            setEditorFields(editorFields.filter(f => f.id !== field.id));
-                                                        }}>
-                                                            <Trash2 className="h-3 w-3" />
-                                                        </Button>
                                                     </div>
-                                                ))
-                                            )}
+                                                ) : (
+                                                    editorFields.map((field, idx) => (
+                                                        <div key={field.id} className={`p-3 border rounded-lg bg-gray-50 flex items-center gap-3 transition-all hover:border-blue-200 hover:bg-blue-50/50 ${field.parent ? 'ml-8 border-l-4 border-l-purple-300' : ''}`}>
+                                                            <div className="p-1.5 bg-white rounded border shadow-sm text-gray-500">
+                                                                {field.type === 'text' && <Edit className="h-3.5 w-3.5" />}
+                                                                {field.type === 'select' && <GitFork className="h-3.5 w-3.5 text-blue-500" />}
+                                                                {field.type === 'photo' && <FileText className="h-3.5 w-3.5 text-purple-500" />}
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <div className="font-medium text-gray-900">{field.label}</div>
+                                                                <div className="text-xs text-muted-foreground">ID: {field.id}</div>
+                                                            </div>
+                                                            <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">{field.type}</Badge>
+                                                            {isArboMode && idx < editorFields.length - 1 && (
+                                                                <div className="w-px h-4 bg-gray-300 mx-1" />
+                                                            )}
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50" onClick={() => {
+                                                                setEditorFields(editorFields.filter(f => f.id !== field.id));
+                                                            }}>
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-end gap-2">
-                                        <Button variant="outline" size="sm">Annuler</Button>
-                                        <Button size="sm" className="bg-purple-600 hover:bg-purple-700">Enregistrer le modèle</Button>
+                                    <div className="flex justify-end gap-3 pt-4 border-t">
+                                        <Button variant="outline" onClick={() => setSelectedTemplate(null)}>Annuler</Button>
+                                        <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm" onClick={() => {
+                                            toast({ title: "Modèle enregistré", description: `Le modèle "${templateName || 'Nouveau RT'}" a été sauvegardé.` });
+                                            setSelectedTemplate(null);
+                                        }}>
+                                            <Save className="w-4 h-4 mr-2" />
+                                            Enregistrer le modèle
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
+                        ) : (
+                            <div className="space-y-6 animate-in fade-in duration-300">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Existing Templates */}
+                                    <div 
+                                        className="p-5 border rounded-xl bg-white hover:border-blue-400 hover:shadow-md cursor-pointer transition-all group relative"
+                                        onClick={() => handleTemplateClick('standard')}
+                                    >
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-lg">
+                                                <FileText className="h-6 w-6" />
+                                            </div>
+                                            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">Standard</Badge>
+                                        </div>
+                                        <h3 className="font-semibold text-lg text-gray-900">RT Standard</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">Formulaire simple linéaire</p>
+                                        <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+                                            <span className="px-2 py-1 bg-gray-100 rounded">3 champs</span>
+                                            <span className="px-2 py-1 bg-gray-100 rounded">Dernière modif: 10/12/2024</span>
+                                        </div>
+                                    </div>
 
-                        </div>
+                                    <div 
+                                        className="p-5 border rounded-xl bg-white hover:border-purple-400 hover:shadow-md cursor-pointer transition-all group relative"
+                                        onClick={() => handleTemplateClick('complex')}
+                                    >
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div className="p-2.5 bg-purple-50 text-purple-600 rounded-lg">
+                                                <GitFork className="h-6 w-6" />
+                                            </div>
+                                            <Badge variant="secondary" className="bg-purple-50 text-purple-700 hover:bg-purple-100">Complexe</Badge>
+                                        </div>
+                                        <h3 className="font-semibold text-lg text-gray-900">Diagnostic Complet</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">Mode Arborescence activé</p>
+                                        <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+                                            <span className="px-2 py-1 bg-gray-100 rounded">5 niveaux</span>
+                                            <span className="px-2 py-1 bg-gray-100 rounded">Dernière modif: 08/12/2024</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Add New Button */}
+                                    <div 
+                                        className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all text-muted-foreground hover:text-blue-600 h-full min-h-[160px]"
+                                        onClick={() => handleTemplateClick('new')}
+                                    >
+                                        <div className="p-3 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                            <Plus className="h-8 w-8" />
+                                        </div>
+                                        <span className="font-medium">Créer un nouveau modèle</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )
                     ) : (
                         <div className="h-64 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 rounded-lg border-2 border-dashed">
                             <Briefcase className="h-12 w-12 mb-4 opacity-20" />
