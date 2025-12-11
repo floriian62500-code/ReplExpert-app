@@ -606,12 +606,12 @@ export default function InterventionDetails() {
                     <Button onClick={() => {
                         setShowRDFReport(false);
                         toast({ 
-                            title: "Relevé enregistré", 
-                            description: "Une nouvelle intervention a été créée pour la suite des travaux." 
+                            title: "Relevé transmis", 
+                            description: "Le rapport a été envoyé au bureau pour chiffrage et planification." 
                         });
                         setTimeout(() => setLocation("/"), 1500);
                     }} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                        Transmettre et Créer Suite
+                        Transmettre le Relevé
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Annuler</Button>
