@@ -71,6 +71,25 @@ export default function AdminDashboard() {
   const [selectedUniverse, setSelectedUniverse] = useState<string>("");
   const [rtFields, setRtFields] = useState<string[]>([]); // To simulate showing "creation part"
 
+  // New RT Editor State
+  const [isArboMode, setIsArboMode] = useState(false);
+  const [editorFields, setEditorFields] = useState<{id: string, label: string, type: string, parent?: string}[]>([
+      { id: '1', label: 'Type de panne', type: 'select', parent: undefined },
+      { id: '2', label: 'Localisation', type: 'text', parent: undefined }
+  ]);
+  const [newFieldLabel, setNewFieldLabel] = useState("");
+
+  const addField = (type: string) => {
+      const newField = {
+          id: Date.now().toString(),
+          label: newFieldLabel || "Nouveau champ",
+          type,
+          parent: isArboMode && editorFields.length > 0 ? editorFields[editorFields.length - 1].id : undefined
+      };
+      setEditorFields([...editorFields, newField]);
+      setNewFieldLabel("");
+  };
+
   const handleUniverseSelect = (universe: string) => {
       setSelectedUniverse(universe);
       // Mock fields based on universe to show "What is in this RT"
@@ -451,15 +470,57 @@ export default function AdminDashboard() {
                                             <Input placeholder="Ex: Dépannage Fuite" defaultValue="Nouveau RT" />
                                         </div>
                                         <div className="flex items-center space-x-2 pt-8">
-                                            <Switch id="arbo-mode" />
+                                            <Switch 
+                                                id="arbo-mode" 
+                                                checked={isArboMode}
+                                                onCheckedChange={setIsArboMode}
+                                            />
                                             <Label htmlFor="arbo-mode" className="cursor-pointer">Mode Arborescence</Label>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label>Structure des données</Label>
-                                        <div className="bg-white border rounded p-3 text-sm text-muted-foreground min-h-[100px] flex items-center justify-center border-dashed">
-                                            Faites glisser des champs ou des groupes ici...
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <Label>Structure des données</Label>
+                                            <div className="flex gap-2">
+                                                <Input 
+                                                    placeholder="Libellé..." 
+                                                    value={newFieldLabel}
+                                                    onChange={(e) => setNewFieldLabel(e.target.value)}
+                                                    className="w-32 h-8 text-xs"
+                                                />
+                                                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('text')}>+ Texte</Button>
+                                                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('select')}>+ Choix</Button>
+                                                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('photo')}>+ Photo</Button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="bg-white border rounded p-3 text-sm min-h-[150px] space-y-2">
+                                            {editorFields.length === 0 ? (
+                                                <div className="text-muted-foreground text-center py-8 border-dashed">
+                                                    Faites glisser des champs ou ajoutez-les...
+                                                </div>
+                                            ) : (
+                                                editorFields.map((field, idx) => (
+                                                    <div key={field.id} className={`p-2 border rounded bg-gray-50 flex items-center gap-2 ${field.parent ? 'ml-6 border-l-4 border-l-purple-200' : ''}`}>
+                                                        <div className="p-1 bg-white rounded border">
+                                                            {field.type === 'text' && <Edit className="h-3 w-3 text-gray-500" />}
+                                                            {field.type === 'select' && <GitFork className="h-3 w-3 text-blue-500" />}
+                                                            {field.type === 'photo' && <FileText className="h-3 w-3 text-purple-500" />}
+                                                        </div>
+                                                        <span className="font-medium flex-1">{field.label}</span>
+                                                        <span className="text-xs text-muted-foreground uppercase px-2 py-0.5 bg-gray-200 rounded">{field.type}</span>
+                                                        {isArboMode && idx < editorFields.length - 1 && (
+                                                            <div className="w-px h-4 bg-gray-300 mx-1" />
+                                                        )}
+                                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-600" onClick={() => {
+                                                            setEditorFields(editorFields.filter(f => f.id !== field.id));
+                                                        }}>
+                                                            <Trash2 className="h-3 w-3" />
+                                                        </Button>
+                                                    </div>
+                                                ))
+                                            )}
                                         </div>
                                     </div>
 
