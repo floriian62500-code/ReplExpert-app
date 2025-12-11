@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import Portal from "@/pages/Portal";
 import Dashboard from "@/pages/Dashboard";
 import Planning from "@/pages/Planning";
 import InterventionDetails from "@/pages/InterventionDetails";
@@ -15,7 +16,8 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={Portal} />
+      <Route path="/technician" component={Dashboard} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/planning" component={Planning} />
       <Route path="/interventions" component={Planning} />

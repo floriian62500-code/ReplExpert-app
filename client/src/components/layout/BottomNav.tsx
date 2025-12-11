@@ -6,7 +6,7 @@ export function BottomNav() {
   const [location] = useLocation();
 
   const navItems = [
-    { icon: Home, label: "Accueil", path: "/" },
+    { icon: Home, label: "Accueil", path: "/technician" },
     { icon: History, label: "Historique", path: "/history" },
     { icon: Users, label: "Espace RH", path: "/hr" },
     { icon: User, label: "Compte", path: "/profile" },
@@ -16,7 +16,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border pb-safe z-50">
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => {
-          const isActive = location === item.path || (item.path !== "/" && location.startsWith(item.path));
+          const isActive = location === item.path || (item.path !== "/technician" && location.startsWith(item.path));
           return (
             <Link key={item.path} href={item.path}>
               <a className={cn(

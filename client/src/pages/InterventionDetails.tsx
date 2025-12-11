@@ -609,7 +609,7 @@ export default function InterventionDetails() {
                             title: "Relevé transmis", 
                             description: "Le rapport a été envoyé au bureau pour chiffrage et planification." 
                         });
-                        setTimeout(() => setLocation("/"), 1500);
+                        setTimeout(() => setLocation("/technician"), 1500);
                     }} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
                         Transmettre le Relevé
                     </Button>
@@ -644,7 +644,7 @@ export default function InterventionDetails() {
                                 title: "Dossier clôturé", 
                                 description: "L'intervention est passée au statut 'Terminé'." 
                             });
-                            setTimeout(() => setLocation("/"), 1000);
+                            setTimeout(() => setLocation("/technician"), 1000);
                         }}
                     >
                         <Ban className="h-6 w-6 text-gray-500" />
