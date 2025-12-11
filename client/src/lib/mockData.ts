@@ -58,14 +58,42 @@ export interface HRData {
   pendingLeaveRequests: number;
 }
 
-export const MOCK_TECHNICIAN: Technician = {
-  id: "tech-001",
-  firstName: "Thomas",
-  lastName: "Dubois",
-  monthlyRevenue: 8500,
-  monthlyGoal: 12000,
-  status: "off_work"
-};
+export const MOCK_TECHNICIANS: Technician[] = [
+  {
+    id: "tech-001",
+    firstName: "Thomas",
+    lastName: "Dubois",
+    monthlyRevenue: 8500,
+    monthlyGoal: 12000,
+    status: "active"
+  },
+  {
+    id: "tech-002",
+    firstName: "Lucas",
+    lastName: "Martin",
+    monthlyRevenue: 6200,
+    monthlyGoal: 10000,
+    status: "active"
+  },
+  {
+    id: "tech-003",
+    firstName: "Sophie",
+    lastName: "Petit",
+    monthlyRevenue: 10500,
+    monthlyGoal: 11000,
+    status: "break"
+  },
+  {
+    id: "tech-004",
+    firstName: "Karim",
+    lastName: "Benzema",
+    monthlyRevenue: 4000,
+    monthlyGoal: 9000,
+    status: "off_work"
+  }
+];
+
+export const MOCK_TECHNICIAN: Technician = MOCK_TECHNICIANS[0];
 
 export const MOCK_HR: HRData = {
   weeklyHours: 32,
