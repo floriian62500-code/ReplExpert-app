@@ -48,6 +48,7 @@ export interface Technician {
   lastName: string;
   monthlyRevenue: number;
   monthlyGoal: number;
+  daysPresent: number; // Added for daily goal calculation
   status: "active" | "break" | "off_work";
 }
 
@@ -65,6 +66,7 @@ export const MOCK_TECHNICIANS: Technician[] = [
     lastName: "Dubois",
     monthlyRevenue: 8500,
     monthlyGoal: 12000,
+    daysPresent: 20,
     status: "active"
   },
   {
@@ -73,6 +75,7 @@ export const MOCK_TECHNICIANS: Technician[] = [
     lastName: "Martin",
     monthlyRevenue: 6200,
     monthlyGoal: 10000,
+    daysPresent: 18,
     status: "active"
   },
   {
@@ -81,6 +84,7 @@ export const MOCK_TECHNICIANS: Technician[] = [
     lastName: "Petit",
     monthlyRevenue: 10500,
     monthlyGoal: 11000,
+    daysPresent: 22,
     status: "break"
   },
   {
@@ -89,6 +93,7 @@ export const MOCK_TECHNICIANS: Technician[] = [
     lastName: "Benzema",
     monthlyRevenue: 4000,
     monthlyGoal: 9000,
+    daysPresent: 15,
     status: "off_work"
   }
 ];

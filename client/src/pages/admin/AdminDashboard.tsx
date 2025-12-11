@@ -59,12 +59,25 @@ export default function AdminDashboard() {
       firstName: "",
       lastName: "",
       monthlyGoal: 10000,
+      daysPresent: 20,
       status: "active"
   });
   const [isAddingTech, setIsAddingTech] = useState(false);
   
   // RT Creation State
   const [isCreatingRT, setIsCreatingRT] = useState(false);
+  const [selectedUniverse, setSelectedUniverse] = useState<string>("");
+  const [rtFields, setRtFields] = useState<string[]>([]); // To simulate showing "creation part"
+
+  const handleUniverseSelect = (universe: string) => {
+      setSelectedUniverse(universe);
+      // Mock fields based on universe to show "What is in this RT"
+      if (universe === 'plomberie') setRtFields(["Type de fuite", "Matériau", "Diamètre"]);
+      else if (universe === 'serrurerie') setRtFields(["Type de serrure", "Dimensions Cylindre", "Marque"]);
+      else if (universe === 'vitrerie') setRtFields(["Type de vitrage", "Clair de jour", "Épaisseur"]);
+      else if (universe === 'electricite') setRtFields(["Type de panne", "Installation (Mono/Tri)"]);
+      else setRtFields(["Prise de cotes libre", "Photos"]);
+  };
 
   const handleSaveTech = () => {
       if (editingTech) {
@@ -81,12 +94,13 @@ export default function AdminDashboard() {
           firstName: newTech.firstName || "Nouveau",
           lastName: newTech.lastName || "Technicien",
           monthlyGoal: newTech.monthlyGoal || 10000,
+          daysPresent: newTech.daysPresent || 20,
           monthlyRevenue: 0,
           status: "active"
       };
       setTechnicians([...technicians, techToAdd]);
       setIsAddingTech(false);
-      setNewTech({ firstName: "", lastName: "", monthlyGoal: 10000, status: "active" });
+      setNewTech({ firstName: "", lastName: "", monthlyGoal: 10000, daysPresent: 20, status: "active" });
       toast({ title: "Technicien créé", description: "Le nouveau technicien a été ajouté à l'équipe." });
   };
 
@@ -196,6 +210,15 @@ export default function AdminDashboard() {
                                     <Label htmlFor="goal" className="text-right">Objectif CA (€)</Label>
                                     <Input id="goal" type="number" value={newTech.monthlyGoal} onChange={e => setNewTech({...newTech, monthlyGoal: parseInt(e.target.value)})} className="col-span-3" />
                                 </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="days" className="text-right">Jours Présence</Label>
+                                    <div className="col-span-3 flex items-center gap-2">
+                                        <Input id="days" type="number" value={newTech.daysPresent} onChange={e => setNewTech({...newTech, daysPresent: parseInt(e.target.value)})} />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                            Obj. Jour: {Math.round((newTech.monthlyGoal || 0) / (newTech.daysPresent || 1))}€
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             <DialogFooter>
                                 <Button onClick={handleAddTech}>Valider la création</Button>
@@ -209,8 +232,9 @@ export default function AdminDashboard() {
                         <TableRow>
                           <TableHead>Technicien</TableHead>
                           <TableHead>Statut</TableHead>
-                          <TableHead>Objectif CA</TableHead>
-                          <TableHead>CA Réalisé</TableHead>
+                          <TableHead>Objectif Mensuel</TableHead>
+                          <TableHead>Jours Prés.</TableHead>
+                          <TableHead>Objectif Jour</TableHead>
                           <TableHead>Compétences (Univers)</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
@@ -236,8 +260,9 @@ export default function AdminDashboard() {
                                 </Badge>
                             </TableCell>
                             <TableCell>{tech.monthlyGoal} €</TableCell>
-                            <TableCell className={tech.monthlyRevenue >= tech.monthlyGoal ? "text-green-600 font-bold" : "text-orange-600"}>
-                                {tech.monthlyRevenue} €
+                            <TableCell>{tech.daysPresent}j</TableCell>
+                            <TableCell className="font-medium text-blue-600">
+                                {Math.round(tech.monthlyGoal / (tech.daysPresent || 1))} €
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-wrap gap-1">
@@ -278,7 +303,7 @@ export default function AdminDashboard() {
                                     <Input value={`${editingTech.firstName} ${editingTech.lastName}`} disabled className="col-span-3 bg-muted" />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="edit-goal" className="text-right">Objectif CA (€)</Label>
+                                    <Label htmlFor="edit-goal" className="text-right">Obj. Mensuel (€)</Label>
                                     <Input 
                                         id="edit-goal" 
                                         type="number" 
@@ -286,6 +311,20 @@ export default function AdminDashboard() {
                                         onChange={(e) => setEditingTech({...editingTech, monthlyGoal: parseInt(e.target.value)})}
                                         className="col-span-3" 
                                     />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-days" className="text-right">Jours Présence</Label>
+                                    <div className="col-span-3 flex items-center gap-2">
+                                        <Input 
+                                            id="edit-days" 
+                                            type="number" 
+                                            value={editingTech.daysPresent} 
+                                            onChange={(e) => setEditingTech({...editingTech, daysPresent: parseInt(e.target.value)})}
+                                        />
+                                        <div className="text-xs text-muted-foreground whitespace-nowrap bg-blue-50 px-2 py-1 rounded border border-blue-100">
+                                            Obj. Jour: <span className="font-bold text-blue-700">{Math.round((editingTech.monthlyGoal || 0) / (editingTech.daysPresent || 1))}€</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div className="space-y-4 border rounded-lg p-4 bg-gray-50/50">
@@ -316,68 +355,97 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === "rt" && (
-            <div className="max-w-2xl mx-auto">
-                <Card>
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Left Col: Universe Selection */}
+                <Card className="md:col-span-1 h-fit">
+                    <CardHeader>
+                        <CardTitle className="text-lg">1. Choisir l'Univers</CardTitle>
+                        <CardDescription>Sélectionnez le métier pour configurer le RT.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        {Object.entries(TRADE_CONFIG).map(([key, config]) => (
+                            <div 
+                                key={key}
+                                className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center gap-3 ${selectedUniverse === key ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'hover:bg-gray-50'}`}
+                                onClick={() => handleUniverseSelect(key)}
+                            >
+                                <div className={`w-3 h-3 rounded-full ${selectedUniverse === key ? 'bg-blue-500' : 'bg-gray-200'}`} />
+                                <span className="font-medium text-sm">{config.label}</span>
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+
+                {/* Right Col: Creation Form */}
+                <Card className="md:col-span-2">
                   <CardHeader>
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-purple-100 rounded-lg">
                             <FileText className="h-6 w-6 text-purple-600" />
                         </div>
                         <div>
-                            <CardTitle>Création de Relevé Technique (RT)</CardTitle>
-                            <CardDescription>Initiez un dossier pour un univers métier spécifique.</CardDescription>
+                            <CardTitle>2. Création de Relevé Technique (RT)</CardTitle>
+                            <CardDescription>
+                                {selectedUniverse ? `Configuration pour : ${TRADE_CONFIG[selectedUniverse]?.label}` : "Veuillez sélectionner un univers à gauche"}
+                            </CardDescription>
                         </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>Client</Label>
-                            <Input placeholder="Nom du client" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Adresse d'intervention</Label>
-                            <Input placeholder="Adresse complète" />
-                        </div>
-                        
-                        <div className="space-y-2">
-                            <Label>Univers Métier Concerné</Label>
-                            <Select>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Sélectionner un univers..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Object.entries(TRADE_CONFIG).map(([key, config]) => (
-                                        <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                    {selectedUniverse ? (
+                        <div className="space-y-4">
+                            <div className="bg-slate-50 p-4 rounded-md border border-slate-200 mb-6">
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                    <Hammer className="h-4 w-4" />
+                                    Champs spécifiques inclus pour ce RT :
+                                </h4>
+                                <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                    {rtFields.map((field, idx) => (
+                                        <li key={idx}>{field}</li>
                                     ))}
-                                </SelectContent>
-                            </Select>
-                            <p className="text-xs text-muted-foreground mt-1">Le RT sera adapté aux spécificités de ce métier.</p>
-                        </div>
+                                    <li className="italic text-slate-400">... + Prise de cotes libre & Photos</li>
+                                </ul>
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label>Description de la demande</Label>
-                            <Input placeholder="Détails..." />
-                        </div>
+                            <div className="space-y-2">
+                                <Label>Client</Label>
+                                <Input placeholder="Nom du client" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Adresse d'intervention</Label>
+                                <Input placeholder="Adresse complète" />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label>Description de la demande</Label>
+                                <Input placeholder="Détails..." />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label>Technicien Assigné</Label>
-                            <Select>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Choisir un technicien..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {technicians.map((tech) => (
-                                        <SelectItem key={tech.id} value={tech.id}>{tech.firstName} {tech.lastName}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
+                            <div className="space-y-2">
+                                <Label>Technicien Assigné</Label>
+                                <Select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choisir un technicien..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {technicians.map((tech) => (
+                                            <SelectItem key={tech.id} value={tech.id}>{tech.firstName} {tech.lastName}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                    <Button onClick={handleCreateRT} className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-lg">
-                        Créer et Assigner le RT
-                    </Button>
+                            <Button onClick={handleCreateRT} className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-lg mt-4">
+                                Créer et Assigner le RT {TRADE_CONFIG[selectedUniverse]?.label}
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="h-64 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 rounded-lg border-2 border-dashed">
+                            <Briefcase className="h-12 w-12 mb-4 opacity-20" />
+                            <p>Sélectionnez un univers métier dans la colonne de gauche</p>
+                            <p>pour commencer la création du RT.</p>
+                        </div>
+                    )}
                   </CardContent>
                 </Card>
             </div>
