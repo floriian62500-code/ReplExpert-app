@@ -1,21 +1,16 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { 
-  LayoutDashboard, 
   Users, 
-  Calendar, 
-  Settings, 
   LogOut, 
   Plus, 
   Search, 
   Bell,
-  TrendingUp,
   Briefcase,
-  Target,
   Edit,
-  Save,
   Trash2,
-  Check
+  FileText,
+  Hammer
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,13 +42,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MOCK_INTERVENTIONS, CRM_TYPE_LABELS, CRM_TYPE_COLORS, MOCK_TECHNICIANS, TRADE_CONFIG, Technician } from "@/lib/mockData";
+import { MOCK_TECHNICIANS, TRADE_CONFIG, Technician } from "@/lib/mockData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("technicians");
   const { toast } = useToast();
 
   // Technician Management State
@@ -68,21 +63,9 @@ export default function AdminDashboard() {
   });
   const [isAddingTech, setIsAddingTech] = useState(false);
   
-  // Intervention Management State
-  const [isCreatingIntervention, setIsCreatingIntervention] = useState(false);
-  const [newIntervention, setNewIntervention] = useState({
-      clientName: "",
-      address: "",
-      city: "",
-      type: "plomberie",
-      description: ""
-  });
+  // RT Creation State
+  const [isCreatingRT, setIsCreatingRT] = useState(false);
 
-  // Calculate simple stats
-  const totalInterventions = MOCK_INTERVENTIONS.length;
-  const completedInterventions = MOCK_INTERVENTIONS.filter(i => i.status === "done").length;
-  const revenue = completedInterventions * 150; // Mock average revenue
-  
   const handleSaveTech = () => {
       if (editingTech) {
           setTechnicians(technicians.map(t => t.id === editingTech.id ? editingTech : t));
@@ -107,10 +90,9 @@ export default function AdminDashboard() {
       toast({ title: "Technicien créé", description: "Le nouveau technicien a été ajouté à l'équipe." });
   };
 
-  const handleCreateIntervention = () => {
-      setIsCreatingIntervention(false);
-      toast({ title: "Intervention créée", description: "L'intervention a été assignée." });
-      // In a real app, we would add to MOCK_INTERVENTIONS
+  const handleCreateRT = () => {
+      setIsCreatingRT(false);
+      toast({ title: "Relevé Technique Créé", description: "Le dossier a été ouvert et assigné." });
   };
 
   return (
@@ -127,36 +109,20 @@ export default function AdminDashboard() {
         
         <nav className="flex-1 p-4 space-y-2">
           <Button 
-            variant={activeTab === "dashboard" ? "secondary" : "ghost"} 
-            className="w-full justify-start" 
-            onClick={() => setActiveTab("dashboard")}
-          >
-            <LayoutDashboard className="mr-3 h-5 w-5" />
-            Tableau de bord
-          </Button>
-          <Button 
-            variant={activeTab === "interventions" ? "secondary" : "ghost"} 
-            className="w-full justify-start"
-            onClick={() => setActiveTab("interventions")}
-          >
-            <Calendar className="mr-3 h-5 w-5" />
-            Interventions
-          </Button>
-          <Button 
             variant={activeTab === "technicians" ? "secondary" : "ghost"} 
-            className="w-full justify-start"
+            className="w-full justify-start" 
             onClick={() => setActiveTab("technicians")}
           >
             <Users className="mr-3 h-5 w-5" />
-            Techniciens
+            Gestion Techniciens
           </Button>
           <Button 
-            variant={activeTab === "settings" ? "secondary" : "ghost"} 
+            variant={activeTab === "rt" ? "secondary" : "ghost"} 
             className="w-full justify-start"
-            onClick={() => setActiveTab("settings")}
+            onClick={() => setActiveTab("rt")}
           >
-            <Settings className="mr-3 h-5 w-5" />
-            Paramètres
+            <FileText className="mr-3 h-5 w-5" />
+            Création RT
           </Button>
         </nav>
 
@@ -167,7 +133,7 @@ export default function AdminDashboard() {
             onClick={() => setLocation("/")}
           >
             <LogOut className="mr-3 h-5 w-5" />
-            Retour App Mobile
+            Retour Portail
           </Button>
         </div>
       </aside>
@@ -177,12 +143,10 @@ export default function AdminDashboard() {
         <header className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-3xl font-bold text-gray-800">
-              {activeTab === 'dashboard' && 'Vue d\'ensemble'}
-              {activeTab === 'interventions' && 'Gestion des Interventions'}
-              {activeTab === 'technicians' && 'Équipe Technique'}
-              {activeTab === 'settings' && 'Paramètres'}
+              {activeTab === 'technicians' && 'Gestion des Techniciens'}
+              {activeTab === 'rt' && 'Création de Relevé Technique'}
             </h2>
-            <p className="text-muted-foreground">Bienvenue sur votre espace administrateur.</p>
+            <p className="text-muted-foreground">Espace d'administration simplifié.</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -200,125 +164,24 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {activeTab === "dashboard" && (
-          <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Interventions du jour</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{totalInterventions}</div>
-                  <p className="text-xs text-muted-foreground">+2 depuis hier</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Chiffre d'affaires (Est.)</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{revenue} €</div>
-                  <p className="text-xs text-muted-foreground">+12% par rapport à la semaine dernière</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Techniciens Actifs</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{technicians.length}</div>
-                  <p className="text-xs text-muted-foreground">Sur {technicians.length} au total</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Interventions Table */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Interventions Récentes</CardTitle>
-                  <CardDescription>Suivi en temps réel de l'activité terrain.</CardDescription>
-                </div>
-                <Button onClick={() => setActiveTab("interventions")}>
-                   Voir tout
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Client</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Technicien</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {MOCK_INTERVENTIONS.slice(0, 5).map((intervention) => (
-                      <TableRow key={intervention.id}>
-                        <TableCell className="font-medium">{intervention.id}</TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{intervention.clientName}</span>
-                            <span className="text-xs text-muted-foreground">{intervention.city}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={CRM_TYPE_COLORS[intervention.crmType]}>
-                            {CRM_TYPE_LABELS[intervention.crmType]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={intervention.status === 'done' ? 'default' : intervention.status === 'in_progress' ? 'secondary' : 'outline'}>
-                            {intervention.status === 'todo' ? 'À faire' : intervention.status === 'in_progress' ? 'En cours' : 'Terminé'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarFallback className="text-[10px]">TD</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm">Thomas D.</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/intervention/${intervention.id}`}>Voir</Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
         {activeTab === "technicians" && (
             <div className="space-y-6">
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                      <CardTitle>Gestion des Techniciens</CardTitle>
-                      <CardDescription>Gérez votre équipe, fixez les objectifs et validez les compétences.</CardDescription>
+                      <CardTitle>Équipe Technique</CardTitle>
+                      <CardDescription>Créez les profils, définissez les objectifs (CA) et les compétences par univers.</CardDescription>
                     </div>
                     <Dialog open={isAddingTech} onOpenChange={setIsAddingTech}>
                         <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" /> Nouveau Technicien
+                            <Button className="bg-blue-600 hover:bg-blue-700">
+                                <Plus className="mr-2 h-4 w-4" /> Créer Technicien
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Ajouter un technicien</DialogTitle>
-                                <DialogDescription>Créez un nouveau profil utilisateur.</DialogDescription>
+                                <DialogTitle>Nouveau Technicien</DialogTitle>
+                                <DialogDescription>Renseignez les informations du collaborateur.</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <div className="grid grid-cols-4 items-center gap-4">
@@ -330,12 +193,12 @@ export default function AdminDashboard() {
                                     <Input id="lastName" value={newTech.lastName} onChange={e => setNewTech({...newTech, lastName: e.target.value})} className="col-span-3" />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="goal" className="text-right">Obj. Mensuel (€)</Label>
+                                    <Label htmlFor="goal" className="text-right">Objectif CA (€)</Label>
                                     <Input id="goal" type="number" value={newTech.monthlyGoal} onChange={e => setNewTech({...newTech, monthlyGoal: parseInt(e.target.value)})} className="col-span-3" />
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={handleAddTech}>Créer l'utilisateur</Button>
+                                <Button onClick={handleAddTech}>Valider la création</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -346,8 +209,8 @@ export default function AdminDashboard() {
                         <TableRow>
                           <TableHead>Technicien</TableHead>
                           <TableHead>Statut</TableHead>
-                          <TableHead>Objectif</TableHead>
-                          <TableHead>Réalisé</TableHead>
+                          <TableHead>Objectif CA</TableHead>
+                          <TableHead>CA Réalisé</TableHead>
                           <TableHead>Compétences (Univers)</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
@@ -378,9 +241,9 @@ export default function AdminDashboard() {
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-wrap gap-1">
-                                    <Badge variant="outline" className="text-xs">Plomberie</Badge>
-                                    <Badge variant="outline" className="text-xs">Serrurerie</Badge>
-                                    {/* Mock static skills for prototype */}
+                                    {/* Mock dynamic skills display */}
+                                    <Badge variant="outline" className="text-xs border-cyan-200 bg-cyan-50 text-cyan-700">Plomberie</Badge>
+                                    <Badge variant="outline" className="text-xs border-pink-200 bg-pink-50 text-pink-700">Serrurerie</Badge>
                                 </div>
                             </TableCell>
                             <TableCell className="text-right">
@@ -389,6 +252,9 @@ export default function AdminDashboard() {
                                     setIsEditingTech(true);
                                 }}>
                                     <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600">
+                                    <Trash2 className="h-4 w-4" />
                                 </Button>
                             </TableCell>
                           </TableRow>
@@ -400,19 +266,19 @@ export default function AdminDashboard() {
 
                 {/* Edit Technician Dialog */}
                 <Dialog open={isEditingTech} onOpenChange={setIsEditingTech}>
-                    <DialogContent className="sm:max-w-[500px]">
+                    <DialogContent className="sm:max-w-[600px]">
                         <DialogHeader>
                             <DialogTitle>Modifier Technicien</DialogTitle>
-                            <DialogDescription>Gérez les objectifs et les compétences.</DialogDescription>
+                            <DialogDescription>Gérez les objectifs financiers et les compétences métiers.</DialogDescription>
                         </DialogHeader>
                         {editingTech && (
-                            <div className="grid gap-4 py-4">
+                            <div className="grid gap-6 py-4">
                                 <div className="grid grid-cols-4 items-center gap-4">
                                     <Label className="text-right">Nom</Label>
                                     <Input value={`${editingTech.firstName} ${editingTech.lastName}`} disabled className="col-span-3 bg-muted" />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="edit-goal" className="text-right">Objectif (€)</Label>
+                                    <Label htmlFor="edit-goal" className="text-right">Objectif CA (€)</Label>
                                     <Input 
                                         id="edit-goal" 
                                         type="number" 
@@ -421,184 +287,100 @@ export default function AdminDashboard() {
                                         className="col-span-3" 
                                     />
                                 </div>
-                                <div className="grid grid-cols-4 items-start gap-4">
-                                    <Label className="text-right pt-2">Univers</Label>
-                                    <div className="col-span-3 space-y-2 border p-3 rounded-md">
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="skill1" defaultChecked />
-                                            <Label htmlFor="skill1">Plomberie</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="skill2" defaultChecked />
-                                            <Label htmlFor="skill2">Serrurerie</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="skill3" />
-                                            <Label htmlFor="skill3">Vitrerie</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="skill4" />
-                                            <Label htmlFor="skill4">Électricité</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="skill5" />
-                                            <Label htmlFor="skill5">Menuiserie</Label>
-                                        </div>
+                                
+                                <div className="space-y-4 border rounded-lg p-4 bg-gray-50/50">
+                                    <h4 className="font-medium flex items-center gap-2">
+                                        <Hammer className="h-4 w-4" />
+                                        Compétences par Univers
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {Object.entries(TRADE_CONFIG).map(([key, config]) => (
+                                            <div key={key} className="flex items-center space-x-2 bg-white p-2 rounded border">
+                                                <Checkbox id={`skill-${key}`} defaultChecked={['plomberie', 'serrurerie'].includes(key)} />
+                                                <Label htmlFor={`skill-${key}`} className="text-sm font-normal cursor-pointer flex-1">
+                                                    {config.label}
+                                                </Label>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
                         )}
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsEditingTech(false)}>Annuler</Button>
-                            <Button onClick={handleSaveTech}>Enregistrer</Button>
+                            <Button onClick={handleSaveTech} className="bg-blue-600 hover:bg-blue-700">Enregistrer les modifications</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
         )}
 
-        {activeTab === "interventions" && (
-            <div className="space-y-6">
+        {activeTab === "rt" && (
+            <div className="max-w-2xl mx-auto">
                 <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>Toutes les Interventions</CardTitle>
-                      <CardDescription>Gérez le planning et les relevés techniques.</CardDescription>
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                            <FileText className="h-6 w-6 text-purple-600" />
+                        </div>
+                        <div>
+                            <CardTitle>Création de Relevé Technique (RT)</CardTitle>
+                            <CardDescription>Initiez un dossier pour un univers métier spécifique.</CardDescription>
+                        </div>
                     </div>
-                    <Dialog open={isCreatingIntervention} onOpenChange={setIsCreatingIntervention}>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" /> Créer Intervention / RT
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Nouvelle Intervention</DialogTitle>
-                                <DialogDescription>Créez une intervention ou un relevé technique.</DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="space-y-2">
-                                    <Label>Client</Label>
-                                    <Input placeholder="Nom du client" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Adresse</Label>
-                                    <Input placeholder="Adresse complète" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Type</Label>
-                                        <Select>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Choisir..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="travaux">Dépannage / Travaux</SelectItem>
-                                                <SelectItem value="rdf">Relevé Technique (RT)</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Métier principal</Label>
-                                        <Select>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Choisir..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {Object.entries(TRADE_CONFIG).map(([key, config]) => (
-                                                    <SelectItem key={key} value={key}>{config.label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Description</Label>
-                                    <Input placeholder="Détails de la demande..." />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button onClick={handleCreateIntervention}>Assigner</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
                   </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Client</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead>Rapport</TableHead>
-                          <TableHead>Technicien</TableHead>
-                          <TableHead className="text-right">Action</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {MOCK_INTERVENTIONS.map((intervention) => (
-                          <TableRow key={intervention.id}>
-                            <TableCell className="font-medium">{intervention.id}</TableCell>
-                            <TableCell>
-                              <div className="flex flex-col">
-                                <span className="font-medium">{intervention.clientName}</span>
-                                <span className="text-xs text-muted-foreground">{intervention.city}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={CRM_TYPE_COLORS[intervention.crmType]}>
-                                {CRM_TYPE_LABELS[intervention.crmType]}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={intervention.status === 'done' ? 'default' : intervention.status === 'in_progress' ? 'secondary' : 'outline'}>
-                                {intervention.status === 'todo' ? 'À faire' : intervention.status === 'in_progress' ? 'En cours' : 'Terminé'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                                {intervention.reportStatus === 'submitted' && (
-                                    <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
-                                        <Check className="mr-1 h-3 w-3" /> Reçu
-                                    </Badge>
-                                )}
-                                {intervention.reportStatus === 'pending' && intervention.status === 'done' && (
-                                    <Badge variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200">
-                                        Manquant
-                                    </Badge>
-                                )}
-                                {intervention.reportStatus === 'pending' && intervention.status !== 'done' && (
-                                    <span className="text-muted-foreground text-xs">-</span>
-                                )}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="text-[10px]">TD</AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm">Thomas D.</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm" asChild>
-                                <Link href={`/intervention/${intervention.id}`}>Détails</Link>
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Client</Label>
+                            <Input placeholder="Nom du client" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Adresse d'intervention</Label>
+                            <Input placeholder="Adresse complète" />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label>Univers Métier Concerné</Label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Sélectionner un univers..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.entries(TRADE_CONFIG).map(([key, config]) => (
+                                        <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground mt-1">Le RT sera adapté aux spécificités de ce métier.</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Description de la demande</Label>
+                            <Input placeholder="Détails..." />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Technicien Assigné</Label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Choisir un technicien..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {technicians.map((tech) => (
+                                        <SelectItem key={tech.id} value={tech.id}>{tech.firstName} {tech.lastName}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <Button onClick={handleCreateRT} className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-lg">
+                        Créer et Assigner le RT
+                    </Button>
                   </CardContent>
                 </Card>
             </div>
-        )}
-
-        {activeTab === "settings" && (
-          <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-            <div className="text-center text-muted-foreground">
-              <p>Paramètres globaux en cours de construction</p>
-            </div>
-          </div>
         )}
       </main>
     </div>
