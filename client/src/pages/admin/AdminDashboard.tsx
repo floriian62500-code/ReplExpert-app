@@ -155,6 +155,11 @@ export default function AdminDashboard() {
       toast({ title: "Technicien créé", description: "Le nouveau technicien a été ajouté à l'équipe." });
   };
 
+  const handleDeleteTech = (techId: string) => {
+      setTechnicians(technicians.filter(t => t.id !== techId));
+      toast({ title: "Technicien supprimé", description: "Le technicien a été retiré de la liste." });
+  };
+
   const handleCreateRT = () => {
       setIsCreatingRT(false);
       toast({ title: "Relevé Technique Créé", description: "Le dossier a été ouvert et assigné." });
@@ -329,7 +334,16 @@ export default function AdminDashboard() {
                                 }}>
                                     <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600">
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="text-red-500 hover:text-red-600"
+                                    onClick={() => {
+                                        if (confirm("Êtes-vous sûr de vouloir supprimer ce technicien ?")) {
+                                            handleDeleteTech(tech.id);
+                                        }
+                                    }}
+                                >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </TableCell>
