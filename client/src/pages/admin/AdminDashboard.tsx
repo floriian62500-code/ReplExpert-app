@@ -13,7 +13,11 @@ import {
   Hammer,
   GitFork,
   ArrowLeft,
-  Save
+  Save,
+  Image as ImageIcon,
+  CheckSquare,
+  Settings,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +53,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MOCK_TECHNICIANS, TRADE_CONFIG, Technician } from "@/lib/mockData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+
+// Enhanced Logic Types
+type LogicRule = {
+    triggerValue: string;
+    action: 'show_field' | 'require_photo' | 'show_message';
+    targetId?: string; // For show_field
+    message?: string; // For show_message
+};
+
+type FieldOption = {
+    id: string;
+    label: string;
+    value: string;
+};
+
+type EditorField = {
+    id: string;
+    label: string;
+    type: 'text' | 'select' | 'photo' | 'checkbox' | 'info';
+    parent?: string;
+    options?: FieldOption[];
+    logic?: LogicRule[];
+    required?: boolean;
+    placeholder?: string;
+};
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
@@ -77,32 +108,59 @@ export default function AdminDashboard() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [templateName, setTemplateName] = useState("");
   const [isArboMode, setIsArboMode] = useState(false);
-  const [editorFields, setEditorFields] = useState<{id: string, label: string, type: string, parent?: string}[]>([
-      { id: '1', label: 'Type de panne', type: 'select', parent: undefined },
-      { id: '2', label: 'Localisation', type: 'text', parent: undefined }
+  
+  // Enhanced Editor State
+  const [editorFields, setEditorFields] = useState<EditorField[]>([
+      { id: '1', label: 'Type de panne', type: 'select', options: [
+          { id: 'opt1', label: 'Fuite', value: 'fuite' },
+          { id: 'opt2', label: 'Bouchon', value: 'bouchon' },
+          { id: 'opt3', label: 'Autre', value: 'autre' }
+      ]},
+      { id: '2', label: 'Localisation', type: 'text', placeholder: 'Ex: Cuisine, SDB...' }
   ]);
+  
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [newFieldLabel, setNewFieldLabel] = useState("");
 
-  const addField = (type: string) => {
-      const newField = {
+  const addField = (type: EditorField['type']) => {
+      const newField: EditorField = {
           id: Date.now().toString(),
           label: newFieldLabel || "Nouveau champ",
           type,
-          parent: isArboMode && editorFields.length > 0 ? editorFields[editorFields.length - 1].id : undefined
+          parent: isArboMode && editorFields.length > 0 ? editorFields[editorFields.length - 1].id : undefined,
+          options: type === 'select' ? [{ id: 'opt1', label: 'Option 1', value: 'opt1' }] : undefined,
+          required: false
       };
       setEditorFields([...editorFields, newField]);
       setNewFieldLabel("");
+      setSelectedFieldId(newField.id); // Auto-select new field
+  };
+
+  const updateField = (id: string, updates: Partial<EditorField>) => {
+      setEditorFields(fields => fields.map(f => f.id === id ? { ...f, ...updates } : f));
+  };
+
+  const addOptionToField = (fieldId: string) => {
+      const field = editorFields.find(f => f.id === fieldId);
+      if (field && field.options) {
+          const newOptId = `opt${field.options.length + 1}`;
+          updateField(fieldId, {
+              options: [...field.options, { id: newOptId, label: `Option ${field.options.length + 1}`, value: newOptId }]
+          });
+      }
+  };
+
+  const addLogicToField = (fieldId: string, rule: LogicRule) => {
+       const field = editorFields.find(f => f.id === fieldId);
+       if (field) {
+           const currentLogic = field.logic || [];
+           updateField(fieldId, { logic: [...currentLogic, rule] });
+       }
   };
 
   const handleUniverseSelect = (universe: string) => {
       setSelectedUniverse(universe);
       setSelectedTemplate(null);
-      // Mock fields based on universe to show "What is in this RT"
-      if (universe === 'plomberie') setRtFields(["Type de fuite", "Matériau", "Diamètre"]);
-      else if (universe === 'serrurerie') setRtFields(["Type de serrure", "Dimensions Cylindre", "Marque"]);
-      else if (universe === 'vitrerie') setRtFields(["Type de vitrage", "Clair de jour", "Épaisseur"]);
-      else if (universe === 'electricite') setRtFields(["Type de panne", "Installation (Mono/Tri)"]);
-      else setRtFields(["Prise de cotes libre", "Photos"]);
   };
 
   const handleTemplateClick = (type: 'new' | 'standard' | 'complex') => {
@@ -115,16 +173,19 @@ export default function AdminDashboard() {
           setTemplateName("RT Standard");
           setIsArboMode(false);
           setEditorFields([
-              { id: '1', label: 'Description', type: 'text', parent: undefined },
-              { id: '2', label: 'Localisation', type: 'select', parent: undefined },
-              { id: '3', label: 'Photos', type: 'photo', parent: undefined }
+              { id: '1', label: 'Description', type: 'text', required: true },
+              { id: '2', label: 'Localisation', type: 'select', options: [
+                  { id: 'l1', label: 'Intérieur', value: 'interieur' },
+                  { id: 'l2', label: 'Extérieur', value: 'exterieur' }
+              ]},
+              { id: '3', label: 'Photos', type: 'photo', required: true }
           ]);
       } else if (type === 'complex') {
           setTemplateName("Diagnostic Complet");
           setIsArboMode(true);
           setEditorFields([
-              { id: '1', label: 'Zone', type: 'select', parent: undefined },
-              { id: '2', label: 'Sous-Zone', type: 'select', parent: '1' },
+              { id: '1', label: 'Zone', type: 'select', options: [{id:'z1', label:'Zone A', value:'A'}, {id:'z2', label:'Zone B', value:'B'}] },
+              { id: '2', label: 'Sous-Zone', type: 'select', parent: '1', options: [] },
               { id: '3', label: 'Détail', type: 'text', parent: '2' }
           ]);
       }
@@ -491,65 +552,224 @@ export default function AdminDashboard() {
                                     </div>
 
                                     <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label>Nom du Relevé Technique</Label>
-                                            <Input 
-                                                placeholder="Ex: Dépannage Fuite" 
-                                                value={templateName}
-                                                onChange={(e) => setTemplateName(e.target.value)}
-                                                className="bg-white"
-                                            />
+                                        <div className="flex items-center justify-between">
+                                            <Label className="text-base font-semibold">Structure du formulaire</Label>
+                                            <div className="flex gap-2">
+                                                <Button size="sm" variant="outline" className="h-9 gap-2" onClick={() => addField('text')}>
+                                                    <FileText className="h-4 w-4 text-gray-500" /> + Texte
+                                                </Button>
+                                                <Button size="sm" variant="outline" className="h-9 gap-2" onClick={() => addField('select')}>
+                                                    <CheckSquare className="h-4 w-4 text-blue-500" /> + Choix
+                                                </Button>
+                                                <Button size="sm" variant="outline" className="h-9 gap-2" onClick={() => addField('photo')}>
+                                                    <ImageIcon className="h-4 w-4 text-purple-500" /> + Photo
+                                                </Button>
+                                            </div>
                                         </div>
-
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <Label>Structure des données</Label>
-                                                <div className="flex gap-2">
-                                                    <Input 
-                                                        placeholder="Libellé du champ..." 
-                                                        value={newFieldLabel}
-                                                        onChange={(e) => setNewFieldLabel(e.target.value)}
-                                                        className="w-40 h-8 text-xs bg-white"
-                                                    />
-                                                    <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('text')}>+ Texte</Button>
-                                                    <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('select')}>+ Choix</Button>
-                                                    <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => addField('photo')}>+ Photo</Button>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="bg-white border rounded-lg p-4 text-sm min-h-[200px] space-y-2 shadow-inner">
-                                                {editorFields.length === 0 ? (
-                                                    <div className="text-muted-foreground text-center py-12 border-2 border-dashed rounded-lg">
-                                                        <div className="flex flex-col items-center gap-2">
-                                                            <Plus className="h-8 w-8 opacity-20" />
-                                                            <p>Ajoutez des champs pour commencer</p>
-                                                        </div>
+                                        
+                                        <div className="bg-white border rounded-lg p-4 min-h-[400px] space-y-4 shadow-inner relative">
+                                            {editorFields.length === 0 ? (
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground bg-gray-50/50">
+                                                    <div className="p-4 bg-white rounded-full shadow-sm mb-4">
+                                                        <Plus className="h-8 w-8 opacity-20" />
                                                     </div>
-                                                ) : (
-                                                    editorFields.map((field, idx) => (
-                                                        <div key={field.id} className={`p-3 border rounded-lg bg-gray-50 flex items-center gap-3 transition-all hover:border-blue-200 hover:bg-blue-50/50 ${field.parent ? 'ml-8 border-l-4 border-l-purple-300' : ''}`}>
-                                                            <div className="p-1.5 bg-white rounded border shadow-sm text-gray-500">
-                                                                {field.type === 'text' && <Edit className="h-3.5 w-3.5" />}
-                                                                {field.type === 'select' && <GitFork className="h-3.5 w-3.5 text-blue-500" />}
-                                                                {field.type === 'photo' && <FileText className="h-3.5 w-3.5 text-purple-500" />}
+                                                    <p className="font-medium">Commencez par ajouter des champs</p>
+                                                    <p className="text-sm opacity-70">Utilisez les boutons ci-dessus</p>
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                                                    {/* Builder Canvas */}
+                                                    <div className="lg:col-span-2 space-y-3">
+                                                        {editorFields.map((field, idx) => (
+                                                            <div 
+                                                                key={field.id} 
+                                                                onClick={() => setSelectedFieldId(field.id)}
+                                                                className={`
+                                                                    group relative p-4 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md
+                                                                    ${selectedFieldId === field.id ? 'border-blue-500 bg-blue-50/30' : 'border-gray-100 bg-white hover:border-blue-200'}
+                                                                    ${field.parent ? 'ml-8' : ''}
+                                                                `}
+                                                            >
+                                                                {/* Connection Line for hierarchy */}
+                                                                {field.parent && (
+                                                                    <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-gray-300 rounded-l" />
+                                                                )}
+
+                                                                <div className="flex items-start gap-4">
+                                                                    <div className={`
+                                                                        p-2.5 rounded-lg shrink-0
+                                                                        ${field.type === 'text' && 'bg-gray-100 text-gray-600'}
+                                                                        ${field.type === 'select' && 'bg-blue-100 text-blue-600'}
+                                                                        ${field.type === 'photo' && 'bg-purple-100 text-purple-600'}
+                                                                    `}>
+                                                                        {field.type === 'text' && <FileText className="h-5 w-5" />}
+                                                                        {field.type === 'select' && <CheckSquare className="h-5 w-5" />}
+                                                                        {field.type === 'photo' && <ImageIcon className="h-5 w-5" />}
+                                                                    </div>
+                                                                    
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="flex items-center justify-between mb-1">
+                                                                            <span className="font-semibold text-gray-900 truncate pr-2">
+                                                                                {field.label}
+                                                                            </span>
+                                                                            <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider opacity-60">
+                                                                                {field.type}
+                                                                            </Badge>
+                                                                        </div>
+                                                                        
+                                                                        {/* Preview of content */}
+                                                                        {field.type === 'select' && (
+                                                                            <div className="flex flex-wrap gap-1 mt-2">
+                                                                                {field.options?.map(opt => (
+                                                                                    <span key={opt.id} className="text-xs bg-white border px-2 py-0.5 rounded-full text-gray-600">
+                                                                                        {opt.label}
+                                                                                    </span>
+                                                                                ))}
+                                                                                {(!field.options || field.options.length === 0) && (
+                                                                                    <span className="text-xs text-red-400 italic flex items-center gap-1">
+                                                                                        <AlertCircle className="h-3 w-3" /> Aucune option définie
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+                                                                        
+                                                                        {field.logic && field.logic.length > 0 && (
+                                                                            <div className="mt-2 flex items-center gap-1 text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded w-fit">
+                                                                                <GitFork className="h-3 w-3" />
+                                                                                {field.logic.length} règle(s) active(s)
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <Button 
+                                                                        variant="ghost" 
+                                                                        size="icon" 
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-600 -mr-2"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setEditorFields(editorFields.filter(f => f.id !== field.id));
+                                                                            if (selectedFieldId === field.id) setSelectedFieldId(null);
+                                                                        }}
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex-1">
-                                                                <div className="font-medium text-gray-900">{field.label}</div>
-                                                                <div className="text-xs text-muted-foreground">ID: {field.id}</div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Properties Panel */}
+                                                    <div className="border-l pl-6 space-y-6">
+                                                        {selectedFieldId ? (
+                                                            (() => {
+                                                                const field = editorFields.find(f => f.id === selectedFieldId);
+                                                                if (!field) return null;
+                                                                return (
+                                                                    <div className="space-y-6 animate-in slide-in-from-right-2 duration-200">
+                                                                        <div>
+                                                                            <h4 className="font-semibold text-gray-900 mb-1">Propriétés du champ</h4>
+                                                                            <p className="text-xs text-muted-foreground">ID: {field.id}</p>
+                                                                        </div>
+
+                                                                        <div className="space-y-3">
+                                                                            <div className="space-y-1">
+                                                                                <Label className="text-xs">Libellé (Question)</Label>
+                                                                                <Input 
+                                                                                    value={field.label} 
+                                                                                    onChange={(e) => updateField(field.id, { label: e.target.value })}
+                                                                                    className="h-8"
+                                                                                />
+                                                                            </div>
+
+                                                                            <div className="flex items-center space-x-2 py-2">
+                                                                                <Switch 
+                                                                                    id="req-field" 
+                                                                                    checked={field.required}
+                                                                                    onCheckedChange={(c) => updateField(field.id, { required: c })}
+                                                                                />
+                                                                                <Label htmlFor="req-field" className="text-sm font-normal">Champ obligatoire</Label>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <Separator />
+
+                                                                        {field.type === 'select' && (
+                                                                            <div className="space-y-3">
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <Label className="text-xs font-semibold text-blue-600">Options de réponse</Label>
+                                                                                    <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => addOptionToField(field.id)}>
+                                                                                        <Plus className="h-3 w-3 mr-1" /> Ajouter
+                                                                                    </Button>
+                                                                                </div>
+                                                                                <ScrollArea className="h-[120px] pr-2">
+                                                                                    <div className="space-y-2">
+                                                                                        {field.options?.map((opt, idx) => (
+                                                                                            <div key={opt.id} className="flex gap-2">
+                                                                                                <Input 
+                                                                                                    value={opt.label}
+                                                                                                    onChange={(e) => {
+                                                                                                        const newOpts = [...(field.options || [])];
+                                                                                                        newOpts[idx] = { ...opt, label: e.target.value };
+                                                                                                        updateField(field.id, { options: newOpts });
+                                                                                                    }}
+                                                                                                    className="h-7 text-xs"
+                                                                                                    placeholder={`Option ${idx + 1}`}
+                                                                                                />
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </ScrollArea>
+                                                                            </div>
+                                                                        )}
+
+                                                                        {/* Logic Builder Section */}
+                                                                        {field.type === 'select' && (
+                                                                           <div className="space-y-3 pt-2">
+                                                                               <div className="flex items-center gap-2">
+                                                                                   <GitFork className="h-3 w-3 text-amber-600" />
+                                                                                   <Label className="text-xs font-semibold text-amber-600">Règles conditionnelles</Label>
+                                                                               </div>
+                                                                               
+                                                                               <div className="bg-amber-50 rounded-lg p-3 space-y-3 border border-amber-100">
+                                                                                   <p className="text-[10px] text-amber-800">
+                                                                                       Si la réponse est...
+                                                                                   </p>
+                                                                                   <Select onValueChange={(val) => addLogicToField(field.id, {
+                                                                                       triggerValue: val,
+                                                                                       action: 'require_photo'
+                                                                                   })}>
+                                                                                       <SelectTrigger className="h-7 text-xs bg-white">
+                                                                                           <SelectValue placeholder="Choisir une réponse..." />
+                                                                                       </SelectTrigger>
+                                                                                       <SelectContent>
+                                                                                           {field.options?.map(opt => (
+                                                                                               <SelectItem key={opt.id} value={opt.value}>{opt.label}</SelectItem>
+                                                                                           ))}
+                                                                                       </SelectContent>
+                                                                                   </Select>
+                                                                                   
+                                                                                   <p className="text-[10px] text-amber-800">
+                                                                                       Alors...
+                                                                                   </p>
+                                                                                   <div className="flex gap-2 text-xs font-medium text-amber-900 items-center">
+                                                                                        <ArrowLeft className="h-3 w-3" />
+                                                                                        Exiger une photo
+                                                                                   </div>
+                                                                               </div>
+                                                                           </div> 
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })()
+                                                        ) : (
+                                                            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground space-y-2 opacity-50">
+                                                                <Settings className="h-8 w-8" />
+                                                                <p className="text-sm">Sélectionnez un champ pour le configurer</p>
                                                             </div>
-                                                            <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">{field.type}</Badge>
-                                                            {isArboMode && idx < editorFields.length - 1 && (
-                                                                <div className="w-px h-4 bg-gray-300 mx-1" />
-                                                            )}
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50" onClick={() => {
-                                                                setEditorFields(editorFields.filter(f => f.id !== field.id));
-                                                            }}>
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ))
-                                                )}
-                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
