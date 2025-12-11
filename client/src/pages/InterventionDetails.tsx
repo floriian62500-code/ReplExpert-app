@@ -290,8 +290,20 @@ export default function InterventionDetails() {
                                         <CommandInput placeholder="Rechercher un article..." />
                                         <CommandList>
                                             <CommandEmpty>Aucun article trouvé.</CommandEmpty>
+                                            <CommandGroup heading="Services & Forfaits">
+                                                {MOCK_ARTICLES.filter(a => a.id.startsWith('svc')).map((article) => (
+                                                    <CommandItem
+                                                        key={article.id}
+                                                        onSelect={() => addArticle(article)}
+                                                        className="flex justify-between"
+                                                    >
+                                                        <span>{article.name}</span>
+                                                        <span className="text-muted-foreground ml-2">{article.price}€</span>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
                                             <CommandGroup heading="Base Article">
-                                                {MOCK_ARTICLES.map((article) => (
+                                                {MOCK_ARTICLES.filter(a => !a.id.startsWith('svc')).map((article) => (
                                                     <CommandItem
                                                         key={article.id}
                                                         onSelect={() => addArticle(article)}

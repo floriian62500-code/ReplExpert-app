@@ -368,6 +368,9 @@ export interface Article {
 }
 
 export const MOCK_ARTICLES: Article[] = [
+  { id: "svc-1", name: "Main d'oeuvre (1h)", price: 65.00, unit: "h" },
+  { id: "svc-2", name: "Déplacement", price: 45.00, unit: "forfait" },
+  { id: "svc-3", name: "Petites fournitures", price: 15.00, unit: "forfait" },
   { id: "art-1", name: "Joint fibre 15/21 (sachet de 10)", price: 4.50, unit: "pce" },
   { id: "art-2", name: "Siphon PVC d40", price: 12.00, unit: "pce" },
   { id: "art-3", name: "Robinet arrêt 15/21", price: 18.50, unit: "pce" },
