@@ -10,10 +10,12 @@ import {
   Edit,
   Trash2,
   FileText,
-  Hammer
+  Hammer,
+  GitFork
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { 
   Card, 
   CardContent, 
@@ -387,66 +389,93 @@ export default function AdminDashboard() {
                             <FileText className="h-6 w-6 text-purple-600" />
                         </div>
                         <div>
-                            <CardTitle>2. Création de Relevé Technique (RT)</CardTitle>
+                            <CardTitle>2. Configuration des Relevés Techniques</CardTitle>
                             <CardDescription>
-                                {selectedUniverse ? `Configuration pour : ${TRADE_CONFIG[selectedUniverse]?.label}` : "Veuillez sélectionner un univers à gauche"}
+                                {selectedUniverse ? `Gérez les modèles de RT pour : ${TRADE_CONFIG[selectedUniverse]?.label}` : "Veuillez sélectionner un univers à gauche"}
                             </CardDescription>
                         </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {selectedUniverse ? (
-                        <div className="space-y-4">
-                            <div className="bg-slate-50 p-4 rounded-md border border-slate-200 mb-6">
-                                <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                                    <Hammer className="h-4 w-4" />
-                                    Champs spécifiques inclus pour ce RT :
-                                </h4>
-                                <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                                    {rtFields.map((field, idx) => (
-                                        <li key={idx}>{field}</li>
-                                    ))}
-                                    <li className="italic text-slate-400">... + Prise de cotes libre & Photos</li>
-                                </ul>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Client</Label>
-                                <Input placeholder="Nom du client" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Adresse d'intervention</Label>
-                                <Input placeholder="Adresse complète" />
-                            </div>
+                        <div className="space-y-6">
                             
-                            <div className="space-y-2">
-                                <Label>Description de la demande</Label>
-                                <Input placeholder="Détails..." />
+                            {/* List of existing RTs for this universe */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Mock existing templates */}
+                                <div className="p-4 border rounded-xl bg-white hover:border-purple-400 cursor-pointer transition-all group relative">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                            <FileText className="h-5 w-5" />
+                                        </div>
+                                        <Badge variant="secondary" className="text-xs">Standard</Badge>
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900">RT Standard</h3>
+                                    <p className="text-xs text-muted-foreground mt-1">Formulaire simple (Liste)</p>
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" className="h-6 w-6"><Edit className="h-3 w-3" /></Button>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 border rounded-xl bg-white hover:border-purple-400 cursor-pointer transition-all group relative">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                                            <GitFork className="h-5 w-5" />
+                                        </div>
+                                        <Badge variant="secondary" className="text-xs">Complexe</Badge>
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900">Diagnostic Complet</h3>
+                                    <p className="text-xs text-muted-foreground mt-1">Mode Arborescence activé</p>
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" className="h-6 w-6"><Edit className="h-3 w-3" /></Button>
+                                    </div>
+                                </div>
+
+                                {/* Add New Button */}
+                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all text-muted-foreground hover:text-purple-600 h-full min-h-[120px]"
+                                     onClick={() => toast({ title: "Nouveau modèle", description: "Ouverture de l'éditeur de formulaire..." })}>
+                                    <Plus className="h-8 w-8" />
+                                    <span className="font-medium text-sm">Créer un nouveau RT</span>
+                                </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Technicien Assigné</Label>
-                                <Select>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Choisir un technicien..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {technicians.map((tech) => (
-                                            <SelectItem key={tech.id} value={tech.id}>{tech.firstName} {tech.lastName}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                            <div className="border-t pt-6 mt-6">
+                                <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                                    <Edit className="h-4 w-4" /> 
+                                    Éditeur Rapide (Aperçu)
+                                </h4>
+                                <div className="bg-slate-50 p-4 rounded-lg border space-y-4">
+                                    <div className="flex gap-4">
+                                        <div className="flex-1 space-y-2">
+                                            <Label>Nom du Relevé Technique</Label>
+                                            <Input placeholder="Ex: Dépannage Fuite" defaultValue="Nouveau RT" />
+                                        </div>
+                                        <div className="flex items-center space-x-2 pt-8">
+                                            <Switch id="arbo-mode" />
+                                            <Label htmlFor="arbo-mode" className="cursor-pointer">Mode Arborescence</Label>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label>Structure des données</Label>
+                                        <div className="bg-white border rounded p-3 text-sm text-muted-foreground min-h-[100px] flex items-center justify-center border-dashed">
+                                            Faites glisser des champs ou des groupes ici...
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-2">
+                                        <Button variant="outline" size="sm">Annuler</Button>
+                                        <Button size="sm" className="bg-purple-600 hover:bg-purple-700">Enregistrer le modèle</Button>
+                                    </div>
+                                </div>
                             </div>
 
-                            <Button onClick={handleCreateRT} className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-lg mt-4">
-                                Créer et Assigner le RT {TRADE_CONFIG[selectedUniverse]?.label}
-                            </Button>
                         </div>
                     ) : (
                         <div className="h-64 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 rounded-lg border-2 border-dashed">
                             <Briefcase className="h-12 w-12 mb-4 opacity-20" />
                             <p>Sélectionnez un univers métier dans la colonne de gauche</p>
-                            <p>pour commencer la création du RT.</p>
+                            <p>pour configurer ses modèles de RT.</p>
                         </div>
                     )}
                   </CardContent>
